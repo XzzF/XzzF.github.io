@@ -1,0 +1,602 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>Hello World</title>
+    <url>/2019/10/31/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+<hr>
+<p>This is test for my blog move.</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>动态网页(澎湃网)图片爬取</title>
+    <url>/2019/03/21/%E5%8A%A8%E6%80%81%E7%BD%91%E9%A1%B5-%E6%BE%8E%E6%B9%83%E7%BD%91-%E5%9B%BE%E7%89%87%E7%88%AC%E5%8F%96/</url>
+    <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>上次完成了静态网页的爬取，这次来爬取动态加载的网页。</p>
+<p>静态网页一般通过点击“下一页”来加载下一页的内容，一般来说 URL 都会随页数而产生相应的变化。</p>
+<p>而所谓的动态网站，就是那些下拉自动加载或者点击“加载更多”来加载更多的网页内容，而且网页的 URL 不发生变化；</p>
+<p>这种网页一般采用 AJAX 请求后端服务器，实现动态加载的效果。</p>
+<p>AJAX 具体怎么工作的？还要慢慢了解，这里我只知道动态加载的效果是通过 AJAX 请求服务器完成的；</p>
+<p>既然有请求，就肯定有请求链接，分析出请求链接之后，就可以通过 requests 模拟请求，从而实现数据的爬取。</p>
+<h3 id="爬虫目标"><a href="#爬虫目标" class="headerlink" title="爬虫目标"></a>爬虫目标</h3><ul>
+<li>爬取澎湃网美数课专栏的所有文章中的图片</li>
+</ul>
+<p>地址：(<a href="https://www.thepaper.cn/list_25635" target="_blank" rel="noopener">https://www.thepaper.cn/list_25635</a>)</p>
+<p><img src="http://wx1.sinaimg.cn/large/0072GPWsly1g19k9hwv8tj30rd0ki7fg.jpg" alt="image"></p>
+<h3 id="爬取步骤"><a href="#爬取步骤" class="headerlink" title="爬取步骤"></a>爬取步骤</h3><h4 id="AJAX-请求-url-分析"><a href="#AJAX-请求-url-分析" class="headerlink" title="AJAX 请求 url 分析"></a>AJAX 请求 url 分析</h4><p>首先 <code>F12</code> 进入开发者页面，选择 <code>Network</code>，再点击 <code>XHR</code> ；这个 XHR 就是 AJAX 的请求类型；</p>
+<p>然后一直下拉网页，让它加载几次之后，就能看到出现了几个特殊的请求链接；</p>
+<p>随便点击一个请求链接，就能看到这个请求的详细信息；里面的 <code>Request URL</code> 就是 AJAX 请求后台服务器的完整链接。</p>
+<p><img src="http://wx2.sinaimg.cn/large/0072GPWsly1g19kxh6o5xj30yc0j40v2.jpg" alt="image"></p>
+<p>找到请求链接之后，来看一下有没有什么规律：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">https://www.thepaper.cn/load_index.jsp?nodeids=25635&amp;topCids=&amp;pageidx=2&amp;isList=true&amp;lastTime=1549194757315</span><br><span class="line">https://www.thepaper.cn/load_index.jsp?nodeids=25635&amp;topCids=&amp;pageidx=3&amp;isList=true&amp;lastTime=1545817966882</span><br><span class="line">https://www.thepaper.cn/load_index.jsp?nodeids=25635&amp;topCids=&amp;pageidx=4&amp;isList=true&amp;lastTime=1542155759648</span><br></pre></td></tr></table></figure>
+
+<p>通过观察可以发现，请求链接只有 <code>pageidx</code> 和 <code>lastTime</code> 两个参数在变化，前者显然是一页一页的增加的，后面那个完全没有规律好嘛？</p>
+<p>索性，，，删掉试试；果然，那个 <code>lastTime</code> 参数并没有什么用处，删掉之后一样能得到返回的结果。</p>
+<p>这样请求链接就变得相当有规律了，就能很方便的用 for 循环构造了；甚至那个 <code>isList=true</code> 都可以不要了；某一返回结果如下图：</p>
+<p><img src="https://ws4.sinaimg.cn/large/0072GPWsgy1g19lhrm8ahj30mh0hcwil.jpg" alt="image"></p>
+<h4 id="返回结果分析"><a href="#返回结果分析" class="headerlink" title="返回结果分析"></a>返回结果分析</h4><p>可以看到每篇文章的标题里都会有一个链接：</p>
+<p><img src="https://ws3.sinaimg.cn/large/0072GPWsly1g19lp88kuwj30sv0cdjvs.jpg" alt="image"></p>
+<p>打开那个链接，就进入到了那篇文章的详情页面；</p>
+<p>而且，对文章中的图片进行 <code>检查</code>，图片的源地址暴露无疑：</p>
+<p><img src="https://ws3.sinaimg.cn/large/0072GPWsly1g19lw9i6r7j30ua0dk44c.jpg" alt="image"></p>
+<p>到这里就差不多了，总体思路就是：先模拟 AJAX 请求，在返回的结果页面中提取出详情页面的链接，然后再对详情页面中的图片地址进行提取，最后下载。</p>
+<h3 id="爬取结果"><a href="#爬取结果" class="headerlink" title="爬取结果"></a>爬取结果</h3><p>最后是下载到了一个本地的文件夹里：</p>
+<p><img src="https://ws2.sinaimg.cn/large/0072GPWsly1g19m2jrdidj30i70dddi0.jpg" alt="image"></p>
+<h3 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> bs4</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> multiprocessing</span><br><span class="line"></span><br><span class="line">Domain = <span class="string">'https://www.thepaper.cn/'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 爬取的动态页面</span></span><br><span class="line">URL = <span class="string">'https://www.thepaper.cn/list_25635'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 请求头部</span></span><br><span class="line">headers = &#123;</span><br><span class="line">	<span class="string">'User-Agent'</span>: <span class="string">'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取当前 url 的 html 文本</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_html</span><span class="params">(url)</span> :</span></span><br><span class="line">	response = requests.get(url, headers = headers)</span><br><span class="line">	<span class="keyword">if</span> (response.status_code == <span class="number">200</span>) :</span><br><span class="line">		<span class="keyword">return</span> response.text</span><br><span class="line">	<span class="keyword">else</span> : <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 解析当前的 html 文本</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ParseThisPage</span><span class="params">(html)</span> :</span></span><br><span class="line">	soup = bs4.BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br><span class="line"></span><br><span class="line">	lts = soup.find_all(<span class="string">'h2'</span>)</span><br><span class="line">	<span class="keyword">for</span> s <span class="keyword">in</span> lts :</span><br><span class="line">		<span class="comment"># yield 会返回一个可迭代的 生成器 (generator), </span></span><br><span class="line">		<span class="comment"># 只能一次性迭代</span></span><br><span class="line">		<span class="keyword">yield</span> &#123;</span><br><span class="line">		<span class="string">'title'</span>: s.a.text, </span><br><span class="line">		<span class="comment"># 详情页面的链接 (只有后缀)</span></span><br><span class="line">		<span class="string">'href'</span>: s.a[<span class="string">'href'</span>]</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取当前 html 文本中的图片链接</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_pic_urls</span><span class="params">(html)</span> :</span></span><br><span class="line">	soup = bs4.BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span>(soup.h1) :</span><br><span class="line">		<span class="comment"># 取出 &lt;h1&gt;, 标题</span></span><br><span class="line">		title = soup.h1.text</span><br><span class="line">		<span class="comment"># width 给出的是一个 list, 可以找到所有 width = "100%" 或 width = "600" 的 &lt;img&gt; 标签</span></span><br><span class="line">		lts = soup.find_all(name = <span class="string">'img'</span>, width = [<span class="string">'100%'</span>, <span class="string">'600'</span>])</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span> i <span class="keyword">in</span> range(len(lts)) :</span><br><span class="line">			pic_url = lts[i].attrs[<span class="string">'src'</span>]</span><br><span class="line">			<span class="comment"># num 用来计数</span></span><br><span class="line">			<span class="keyword">yield</span> &#123;</span><br><span class="line">			<span class="string">'title'</span>: title,</span><br><span class="line">			<span class="string">'pic_url'</span>: pic_url,</span><br><span class="line">			<span class="string">'num'</span>: i</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 保存图片</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">save_pics</span><span class="params">(pic)</span> :</span></span><br><span class="line">	<span class="string">'''</span></span><br><span class="line"><span class="string">	:pic: 一个字典, 包括 &#123;'title': 标题, 'pic_url': 图片链接, 'num': 编号&#125;</span></span><br><span class="line"><span class="string">	'''</span></span><br><span class="line"></span><br><span class="line">	title = pic[<span class="string">'title'</span>]</span><br><span class="line">	url = pic[<span class="string">'pic_url'</span>]</span><br><span class="line">	num = pic[<span class="string">'num'</span>]</span><br><span class="line">	<span class="comment"># 用来去除一些文件名中不允许的字符</span></span><br><span class="line">	<span class="comment"># 文章标题中有好多半角字符的 ｜</span></span><br><span class="line">	title = re.sub(<span class="string">r'[ \/:*?"&lt;&gt;|｜]'</span>, <span class="string">''</span>, title).strip()</span><br><span class="line">	<span class="comment"># print (title)</span></span><br><span class="line"></span><br><span class="line">	<span class="comment"># 为当前这篇文章新建一个文件夹</span></span><br><span class="line">	<span class="keyword">if</span> <span class="keyword">not</span> os.path.exists(title) :</span><br><span class="line">		os.mkdir(title)</span><br><span class="line"></span><br><span class="line">	response = requests.get(url, headers = headers)</span><br><span class="line">	<span class="keyword">try</span>:</span><br><span class="line">		<span class="keyword">if</span> (response.status_code == <span class="number">200</span>) :</span><br><span class="line">			<span class="comment"># 保存图片</span></span><br><span class="line">			file = <span class="string">'&#123;0&#125;/&#123;1&#125;.jpg'</span>.format(title, num)</span><br><span class="line">			<span class="keyword">if</span> <span class="keyword">not</span> os.path.exists(file) :</span><br><span class="line">				<span class="keyword">with</span> open(file, <span class="string">'wb'</span>) <span class="keyword">as</span> f :</span><br><span class="line">					f.write(response.content)</span><br><span class="line">					print(<span class="string">'文章"&#123;0&#125;"的第&#123;1&#125;张图片下载完成'</span>.format(title,num))</span><br><span class="line">	<span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">		<span class="keyword">print</span> (<span class="string">'Picture download failed'</span>)</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">Job</span><span class="params">(i)</span> :</span></span><br><span class="line">	<span class="comment"># 构造 AJAX 的请求 url</span></span><br><span class="line">	cur_url = Domain + <span class="string">'load_index.jsp?nodeids=25635&amp;topCids=&amp;pageidx='</span> + str(i)</span><br><span class="line">	html = get_html(cur_url)</span><br><span class="line">	suffixs = ParseThisPage(html)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> item <span class="keyword">in</span> suffixs :</span><br><span class="line">		<span class="comment"># 解析详情页面</span></span><br><span class="line">		html = get_html(Domain + item[<span class="string">'href'</span>])</span><br><span class="line">		<span class="comment"># 获取图片的 urls</span></span><br><span class="line">		pic_urls = get_pic_urls(html)</span><br><span class="line">		<span class="comment"># 保存图片</span></span><br><span class="line">		<span class="keyword">for</span> pic <span class="keyword">in</span> pic_urls :</span><br><span class="line">			save_pics(pic)</span><br><span class="line"></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string"># 单进程, 耗时 1165.7s</span></span><br><span class="line"><span class="string">if __name__ == '__main__' :</span></span><br><span class="line"><span class="string">	# 新建一个文件夹</span></span><br><span class="line"><span class="string">	if not os.path.exists('pengpai_pictures') :</span></span><br><span class="line"><span class="string">		os.mkdir('pengpai_pictures')</span></span><br><span class="line"><span class="string">	# 切换到那个文件夹下</span></span><br><span class="line"><span class="string">	os.chdir('./pengpai_pictures')</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">	for i in range(1, 26) :</span></span><br><span class="line"><span class="string">		Job(i)</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 多进程, 耗时 343.8s</span></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span> :</span><br><span class="line">	<span class="keyword">if</span> <span class="keyword">not</span> os.path.exists(<span class="string">'pengpai_pictures'</span>) :</span><br><span class="line">		os.mkdir(<span class="string">'pengpai_pictures'</span>)</span><br><span class="line">	os.chdir(<span class="string">'./pengpai_pictures'</span>)</span><br><span class="line"></span><br><span class="line">	pl = multiprocessing.Pool()</span><br><span class="line">	pl.map(Job, [i <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, <span class="number">26</span>)])</span><br><span class="line">	pl.close()</span><br><span class="line">	pl.join()</span><br></pre></td></tr></table></figure>
+
+<h3 id="外话"><a href="#外话" class="headerlink" title="外话"></a>外话</h3><p>这里尝试了一下多进程爬取，效果非常明显，普通下载 1000+ s，多进程下载 300+ s；虽然我不太懂多进程具体是怎么回事，就冲着这个效果，也要学一学吧。</p>
+]]></content>
+      <categories>
+        <category>Python</category>
+      </categories>
+      <tags>
+        <tag>爬虫</tag>
+        <tag>动态网页抓取</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>猫眼电影Top100</title>
+    <url>/2019/02/25/%E7%8C%AB%E7%9C%BC%E7%94%B5%E5%BD%B1Top100/</url>
+    <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>本来是爬豆瓣电影 Top250 的，数据都爬下来了，发现后面的数据分析不太好做，然后就去爬猫眼了。</p>
+<h3 id="爬虫目标"><a href="#爬虫目标" class="headerlink" title="爬虫目标"></a>爬虫目标</h3><ul>
+<li>爬取猫眼电影 Top100 的电影名称、人物、时间、评分等，并保存为 csv 文件；</li>
+<li>对所爬取的数据进行一定的分析。</li>
+</ul>
+<p>环境：Win10 + Python3.7 (以及一些第三方库) + SublimeText3</p>
+<h3 id="基本步骤"><a href="#基本步骤" class="headerlink" title="基本步骤"></a>基本步骤</h3><h4 id="URL-分析"><a href="#URL-分析" class="headerlink" title="URL 分析"></a>URL 分析</h4><p>先进入 ( <a href="https://maoyan.com/board/4?offset=0" target="_blank" rel="noopener">https://maoyan.com/board/4?offset=0</a> ) ，点击第二页，发现链接变为 ( <a href="https://maoyan.com/board/4?offset=10" target="_blank" rel="noopener">https://maoyan.com/board/4?offset=10</a> )，就只有 <code>offset=XXX</code> 参数变了；进一步发现每页只有 10 部电影，所以第一页 <code>offset=0</code>， 第二页 <code>offset=10</code> ，依次类推，只需要 10 次循环就能爬完 100 部电影了。</p>
+<h4 id="获取页面"><a href="#获取页面" class="headerlink" title="获取页面"></a>获取页面</h4><p>直接用 requests.get() 来获取页面：</p>
+<p>官网：<a href="http://www.python-requests.org/en/master/" target="_blank" rel="noopener">Requests</a>；<a href="http://cn.python-requests.org/zh_CN/latest/" target="_blank" rel="noopener">中文文档</a>；</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 获得网页的 html 文本</span></span><br><span class="line">html = requests.get(url, headers = headers).text</span><br></pre></td></tr></table></figure>
+
+<p>这个页面几乎没有反爬，所以成功获取页面的图片就不上了；接下来就可以开始解析页面了。</p>
+<h4 id="页面解析"><a href="#页面解析" class="headerlink" title="页面解析"></a>页面解析</h4><p>右键-检查- Elements 选项 (或按 <code>F12</code>) 进入调试页面，</p>
+<p>可以看到要抓取的电影信息都包含在一个 <code>&lt;dl class=&quot;board-wrapper&quot;&gt;</code> 标签下的 <code>&lt;dd&gt;</code> 标签里，更具体的可以看到：</p>
+<p>电影名称在一个 <code>&lt;p class=&quot;name&quot;&gt;</code> 的标签里；</p>
+<p>主演在一个 <code>&lt;p class=&quot;star&quot;&gt;</code> 的标签里；</p>
+<p>上映时间和电影出自哪个地区 (有的电影可能没有写地区) 在一个 <code>&lt;p class=&quot;releasetime&quot;&gt;</code> 的标签里；</p>
+<p>电影评分就在 <code>&lt;p class=&quot;score&quot;&gt;</code> 的标签里，只是整数和小数部分是分开的，一会儿合起来就行了。</p>
+<p><img src="https://wx2.sinaimg.cn/large/0072GPWsly1g11kj7taqbj30tj0hitdz.jpg" alt="image"></p>
+<p>这里采用较为简单的 BeautifulSoup 来解析页面 ；</p>
+<p>提一下 <code>find()</code> 和 <code>find_all()</code> 的区别：</p>
+<ul>
+<li><code>find()</code> 选取到的是<strong>第一个</strong>满足选取条件的标签</li>
+<li><code>find_all()</code> 选取到的是<strong>所有</strong>满足选取条件的标签</li>
+</ul>
+<p>强大的 BeautifulSoup 可以越过父节点直接选取；有时间学学其他的，比如什么 xpath、正则啥的。</p>
+<p>官网：<a href="https://www.crummy.com/software/BeautifulSoup/bs4/doc/" target="_blank" rel="noopener">BeautifulSoup</a>；良心官网啊，有中文文档。</p>
+<p>具体代码如下：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 把上映时间和上映地区分开</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getRelease</span><span class="params">(info)</span> :</span></span><br><span class="line">	<span class="string">'''</span></span><br><span class="line"><span class="string">	:param info: 上映信息的字符串 "YY-MM-DD(Area)"</span></span><br><span class="line"><span class="string">	'''</span></span><br><span class="line"></span><br><span class="line">	l = info.split(<span class="string">'('</span>)</span><br><span class="line">	<span class="keyword">try</span> :</span><br><span class="line">		time = l[<span class="number">0</span>][<span class="number">5</span>:]</span><br><span class="line">	<span class="keyword">except</span> : time = <span class="string">'Unknow'</span></span><br><span class="line">	<span class="keyword">try</span> :</span><br><span class="line">		area = l[<span class="number">1</span>][:<span class="number">-1</span>]</span><br><span class="line">	<span class="keyword">except</span> : area = <span class="string">'Unknow'</span></span><br><span class="line">	<span class="keyword">return</span> time, area</span><br><span class="line"></span><br><span class="line"><span class="comment"># 解析当前页面</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">parseThisPage</span><span class="params">(url)</span> :</span></span><br><span class="line">	<span class="string">'''</span></span><br><span class="line"><span class="string">	:param url: 爬取的网页</span></span><br><span class="line"><span class="string">	'''</span></span><br><span class="line"></span><br><span class="line">	<span class="comment"># 获得网页的 html 文本</span></span><br><span class="line">	html = requests.get(url, headers = headers).text</span><br><span class="line">	<span class="comment"># print (html)</span></span><br><span class="line">	<span class="comment"># 构造解析器</span></span><br><span class="line">	soup = BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br><span class="line">	</span><br><span class="line">	<span class="comment"># 找到 &lt;dl class='board-wrapper'&gt; 中的所有 &lt;dd&gt; 标签</span></span><br><span class="line">	<span class="comment"># 是一个 list </span></span><br><span class="line">	lists = soup.find(<span class="string">'dl'</span>, &#123;<span class="string">'class'</span>: <span class="string">'board-wrapper'</span>&#125;).find_all(<span class="string">'dd'</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> item <span class="keyword">in</span> lists :</span><br><span class="line">	</span><br><span class="line">		<span class="comment"># 找 class='name' 的 &lt;p&gt; 标签, 其 &lt;a&gt; 子标签的文本就是电影名称</span></span><br><span class="line">		name = item.find(<span class="string">'p'</span>, &#123;<span class="string">'class'</span>: <span class="string">'name'</span>&#125;).a.text</span><br><span class="line">		<span class="comment"># class='star' 的文本就是主演 (并把前面 "主演：" 去掉)</span></span><br><span class="line">		star = item.find(<span class="string">'p'</span>, &#123;<span class="string">'class'</span>: <span class="string">'star'</span>&#125;).text.strip()[<span class="number">3</span>:]</span><br><span class="line"></span><br><span class="line">		<span class="comment"># 电影评分 整数和小数分开的, 爬下来之后合起来就行</span></span><br><span class="line">		score_info = item.find(<span class="string">'p'</span>, &#123;<span class="string">'class'</span>: <span class="string">'score'</span>&#125;).find_all(<span class="string">'i'</span>)</span><br><span class="line">		score = score_info[<span class="number">0</span>].text + score_info[<span class="number">1</span>].text</span><br><span class="line">		</span><br><span class="line">		<span class="comment"># 先爬取上映信息</span></span><br><span class="line">		release_info = item.find(<span class="string">'p'</span>, &#123;<span class="string">'class'</span>: <span class="string">'releasetime'</span>&#125;).text</span><br><span class="line">		<span class="comment"># 获得对应的时间和地区</span></span><br><span class="line">		time = getRelease(release_info)[<span class="number">0</span>]</span><br><span class="line">		area = getRelease(release_info)[<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">		<span class="comment"># 合成一个字典</span></span><br><span class="line">		info  = &#123;<span class="string">'name'</span>: name, <span class="string">'stars'</span>: star, <span class="string">'score'</span>: score, <span class="string">'time'</span>: time, <span class="string">'area'</span>: area&#125;</span><br><span class="line"></span><br><span class="line">		information.append(info)</span><br></pre></td></tr></table></figure>
+
+
+<h4 id="保存数据"><a href="#保存数据" class="headerlink" title="保存数据"></a>保存数据</h4><p>利用 csv 包的 <code>DictWriter()</code> 函数将字典格式的数据写入 csv 文件；</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">WriteDictToCSV</span><span class="params">(csv_file, csv_cols, dict_data)</span> :</span></span><br><span class="line">	<span class="string">'''</span></span><br><span class="line"><span class="string">	:param csv_file: csv 文件的路径</span></span><br><span class="line"><span class="string">	:param csv_cols: csv 文件的列名</span></span><br><span class="line"><span class="string">	:param dict_data: 元素为字典的 list 数据</span></span><br><span class="line"><span class="string">	'''</span></span><br><span class="line"></span><br><span class="line">	<span class="comment"># 指定编码方式为 utf-8 (newline 参数不这样指定的话, 会有多的空行)</span></span><br><span class="line">	<span class="keyword">with</span> open(csv_file, <span class="string">'w'</span>, newline = <span class="string">''</span>, encoding = <span class="string">'utf-8'</span>) <span class="keyword">as</span> csvfile :</span><br><span class="line"></span><br><span class="line">		<span class="comment"># 传递列名给相应的参数</span></span><br><span class="line">		writer = csv.DictWriter(csvfile, fieldnames = csv_cols)</span><br><span class="line">		writer.writeheader()    <span class="comment"># 写入列名</span></span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span> data <span class="keyword">in</span> dict_data :</span><br><span class="line">			writer.writerow(data)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">save_data</span><span class="params">()</span> :</span></span><br><span class="line">	<span class="comment"># 获取当前路径 并指定文件名</span></span><br><span class="line">	csv_file = os.getcwd() + <span class="string">'\\猫眼电影Top100.csv'</span></span><br><span class="line">	<span class="comment"># 指定列名</span></span><br><span class="line">	csv_cols = [<span class="string">'name'</span>, <span class="string">'stars'</span>, <span class="string">'score'</span>, <span class="string">'time'</span>, <span class="string">'area'</span>]</span><br><span class="line">	WriteDictToCSV(csv_file, csv_cols, information)</span><br></pre></td></tr></table></figure>
+
+<h4 id="分页爬取"><a href="#分页爬取" class="headerlink" title="分页爬取"></a>分页爬取</h4><p>最后就只需要改变 offset 参数的值，代码如下：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">	<span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>) :</span><br><span class="line">		url = URL + str(i * <span class="number">10</span>)</span><br><span class="line">		parseThisPage(url)</span><br><span class="line"></span><br><span class="line">	save_data()</span><br></pre></td></tr></table></figure>
+
+<p>这样就完成了猫眼电影 Top100 的爬取，结果如下：</p>
+<p><img src="https://wx3.sinaimg.cn/large/0072GPWsly1g13ba5eix3j30q80g4myy.jpg" alt="image"></p>
+<h3 id="数据分析"><a href="#数据分析" class="headerlink" title="数据分析"></a>数据分析</h3><p>接下来对抓取下来的数据进行简单的数据分析，顺便学一下基础的图表。</p>
+<h4 id="评分最高的-10-部电影"><a href="#评分最高的-10-部电影" class="headerlink" title="评分最高的 10 部电影"></a>评分最高的 10 部电影</h4><p>这里用柱状图来呈现，代码如下：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 分析评分最高的 10 部电影</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">Analysis_film</span><span class="params">()</span> :</span></span><br><span class="line">	<span class="comment"># 先按评分排序</span></span><br><span class="line">	top_films = df.sort_values(<span class="string">'score'</span>, ascending = <span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment"># 取出 Top10 电影名称及对应的评分</span></span><br><span class="line">	names = list(top_films.name[:<span class="number">10</span>])</span><br><span class="line">	scores = list(top_films.score[:<span class="number">10</span>])</span><br><span class="line"></span><br><span class="line">	<span class="comment"># 画图的时候不支持字符串, 所以转化为 float</span></span><br><span class="line">	<span class="keyword">for</span> i, v <span class="keyword">in</span> enumerate(scores) :</span><br><span class="line">		scores[i] = float(v)</span><br><span class="line"></span><br><span class="line">	x_pos = [i <span class="keyword">for</span> i, _ <span class="keyword">in</span> enumerate(scores)]   <span class="comment"># 下标</span></span><br><span class="line">	width = <span class="number">0.75</span>    <span class="comment"># 柱条的宽度</span></span><br><span class="line">	<span class="comment"># 柱状图</span></span><br><span class="line">	plt.bar(x_pos, scores, width, color = <span class="string">'#FF5A00'</span>)</span><br><span class="line"></span><br><span class="line">	plt.xlabel(<span class="string">"电影名称"</span>)    <span class="comment"># x 轴的信息</span></span><br><span class="line">	plt.ylabel(<span class="string">"评分"</span>)        <span class="comment"># y 轴的信息</span></span><br><span class="line">	plt.title(<span class="string">"猫眼评分最高的10部电影"</span>)    <span class="comment"># 图表的标题</span></span><br><span class="line"></span><br><span class="line">	plt.ylim( (<span class="number">9.0</span>, <span class="number">9.7</span>) )  <span class="comment"># 设置 y 轴的范围</span></span><br><span class="line"></span><br><span class="line">	<span class="comment"># 给柱条上写上对应的评分</span></span><br><span class="line">	<span class="keyword">for</span> i, v <span class="keyword">in</span> enumerate(scores) :</span><br><span class="line">		<span class="comment"># plt.text(x, y, text, ...) x,y 坐标, text 文本, 后面还可以有其他参数</span></span><br><span class="line">		plt.text(i, v + <span class="number">0.02</span>, str(v), ha = <span class="string">'center'</span>, color = <span class="string">'blue'</span>)</span><br><span class="line"></span><br><span class="line">	plt.xticks(x_pos, names, rotation = <span class="number">-45</span>)</span><br><span class="line">	plt.tight_layout() <span class="comment">#自动控制空白边缘, 以全部显示x轴名称</span></span><br><span class="line">	<span class="comment"># plt.savefig('./imgs/top10_film.png', dpi = 700)  # dpi 表示分辨率</span></span><br><span class="line">	plt.show()</span><br></pre></td></tr></table></figure>
+
+<p>结果如图：</p>
+<p><img src="https://wx4.sinaimg.cn/large/0072GPWsly1g13bjo9fp0j33gg2lc4dw.jpg" alt="image"></p>
+<p>呃，，，才看过一半，有机会再看看其他的吧。</p>
+<h4 id="参演电影数量最多的-10-位演员"><a href="#参演电影数量最多的-10-位演员" class="headerlink" title="参演电影数量最多的 10 位演员"></a>参演电影数量最多的 10 位演员</h4><p>这里也用柱状图来呈现，画图和上面差不多，说一下主要思路和遇到的问题；</p>
+<p>思路很简单，对所有演员去重之后分别统计其参演电影数量就行；当然，参演数量为 1 的就不考虑了，不然太多了。</p>
+<p>期间遇到一个问题：<strong>排序之后的结果不稳定</strong>。就是参演电影数量一样的演员，在每次排完序后，姓名的顺序都是不一样的！</p>
+<p>搜了一下，用 lambda 函数(叫函数还是表达式我也不知道)解决；还需要学一学啊。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 先按第 1 维的值排序，再按第 0 维的值排序</span></span><br><span class="line">dict_star = sorted(dict_star.items(), key = <span class="keyword">lambda</span> x: (x[<span class="number">1</span>], x[<span class="number">0</span>]), reverse = <span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
+
+<p>结果如图：</p>
+<p><img src="https://wx2.sinaimg.cn/large/0072GPWsly1g13dgthi0wj33gg2lcang.jpg" alt="image"></p>
+<h4 id="各国家-或地区-电影数量"><a href="#各国家-或地区-电影数量" class="headerlink" title="各国家(或地区)电影数量"></a>各国家(或地区)电影数量</h4><p>用水平柱状图来看一下这 100 部电影都是来自哪些国家或地区，代码如下：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 分析各国家/地区的电影数量</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">Analysis_area</span><span class="params">()</span> :</span></span><br><span class="line">	<span class="comment"># 按地区分组, 统计数量后排序</span></span><br><span class="line">	area_count = df.groupby(<span class="string">'area'</span>).area.count().sort_values(ascending = <span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">	y_pos = [i <span class="keyword">for</span> i, _ <span class="keyword">in</span> enumerate(area_count.values)]</span><br><span class="line">	width = <span class="number">0.70</span></span><br><span class="line">	<span class="comment"># 水平的柱状图</span></span><br><span class="line">	plt.barh(y_pos, area_count.values, width, align = <span class="string">'center'</span>, color = <span class="string">'red'</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> i, v <span class="keyword">in</span> enumerate(area_count.values) :</span><br><span class="line">		plt.text(v + <span class="number">0.7</span>, i - <span class="number">0.1</span>, str(v), ha = <span class="string">'center'</span>, color = <span class="string">'green'</span>)</span><br><span class="line"></span><br><span class="line">	plt.yticks(y_pos, area_count.index)</span><br><span class="line">	plt.title(<span class="string">u'各国家/地区电影数量'</span>)</span><br><span class="line">	plt.ylabel(<span class="string">u'国家/地区'</span>)</span><br><span class="line">	plt.xlabel(<span class="string">u'数量(部)'</span>)</span><br><span class="line"></span><br><span class="line">	plt.tight_layout()</span><br><span class="line">	<span class="comment"># plt.savefig('./imgs/area.png', dpi = 700)</span></span><br><span class="line">	plt.show()</span><br></pre></td></tr></table></figure>
+
+<p>结果如图：</p>
+<p><img src="https://ws3.sinaimg.cn/large/0072GPWsly1g14qqu1vvzj33gg2lcguo.jpg" alt="image"></p>
+<p>美国电影这么多上榜的倒是一点也不意外，中国的这么少就稍微有点意外了。</p>
+<h4 id="各年份的电影数量"><a href="#各年份的电影数量" class="headerlink" title="各年份的电影数量"></a>各年份的电影数量</h4><p>用折线图看一下各年份的电影数量，代码如下：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 分析各年份的电影数量</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">Analysis_year</span><span class="params">()</span> :</span></span><br><span class="line">	<span class="comment"># method one</span></span><br><span class="line">	<span class="comment"># lambda 表达式, 不是很懂, 但是很简单</span></span><br><span class="line">	<span class="comment"># df['year'] = df['time'].map(lambda x: x.split('-')[0])</span></span><br><span class="line"></span><br><span class="line">	<span class="comment"># method two</span></span><br><span class="line">	df[<span class="string">'year'</span>] = df[<span class="string">'time'</span>].copy()</span><br><span class="line">	<span class="comment"># loc[i, 'year'] 表示第 i 行 year 列的单元值</span></span><br><span class="line">	<span class="keyword">for</span> i, v <span class="keyword">in</span> enumerate( df[<span class="string">'year'</span>] ) :</span><br><span class="line">		df.loc[i, <span class="string">'year'</span>] = v.split(<span class="string">'-'</span>)[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">	<span class="comment"># 指定图形的宽度, 高度 和分辨率</span></span><br><span class="line">	plt.figure(figsize = (<span class="number">13.195</span>, <span class="number">5.841</span>), dpi = <span class="number">700</span>)</span><br><span class="line"></span><br><span class="line">	year_count = df.groupby(by = <span class="string">'year'</span>).year.count()</span><br><span class="line"></span><br><span class="line">	x_pos = [i <span class="keyword">for</span> i, _ <span class="keyword">in</span> enumerate(year_count.values)]</span><br><span class="line"></span><br><span class="line">	<span class="comment"># 折线图</span></span><br><span class="line">	plt.plot(year_count.index, year_count.values, linewidth = <span class="number">2</span>, color = <span class="string">'green'</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment"># 在对应位置写上文本</span></span><br><span class="line">	<span class="keyword">for</span> i, v <span class="keyword">in</span> enumerate(year_count.values) :</span><br><span class="line">		plt.text(i, v + <span class="number">0.2</span>, str(v), ha = <span class="string">'center'</span>, color = <span class="string">'blue'</span>)</span><br><span class="line"></span><br><span class="line">	plt.title(<span class="string">u'各年份上映的电影数量'</span>)</span><br><span class="line">	plt.xlabel(<span class="string">u'年份(年)'</span>)</span><br><span class="line">	plt.ylabel(<span class="string">u'数量(部)'</span>)</span><br><span class="line"></span><br><span class="line">	plt.tight_layout()</span><br><span class="line">	<span class="comment"># plt.savefig('./imgs/year.png', dpi = 700)</span></span><br><span class="line">	plt.show()</span><br></pre></td></tr></table></figure>
+
+<p>结果如图：</p>
+<p><img src="https://wx3.sinaimg.cn/large/0072GPWsly1g14tf8093sj374k35kar6.jpg" alt="image"></p>
+<p>看来 2010、2011 两年出了不少好电影啊，不过那时候在读初中，没什么印象。</p>
+<h3 id="完整程序"><a href="#完整程序" class="headerlink" title="完整程序"></a>完整程序</h3><p><a href="https://github.com/XzzF/Python_Spider/blob/master/Maoyan_film/maoyan_top100.py" target="_blank" rel="noopener">爬虫部分</a></p>
+<p><a href="https://github.com/XzzF/Python_Spider/blob/master/Maoyan_film/maoyan_dv.py" target="_blank" rel="noopener">可视化部分</a></p>
+]]></content>
+      <categories>
+        <category>Python</category>
+      </categories>
+      <tags>
+        <tag>爬虫</tag>
+        <tag>Data_Visualization</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>自建VPN(Brook)翻墙</title>
+    <url>/2019/02/20/%E8%87%AA%E5%BB%BAVPN-Brook%E7%BF%BB%E5%A2%99/</url>
+    <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>闲了太久，18 年 6 月之后就没有再写过 Blog，现在就跟重头再来没有任何区别，都不知道怎么用 Hexo 写文章了，真后悔当时没有留下一些复习资料。</p>
+<p>虽然很久之前就有自建 VPN 的想法，但一直拖到现在。</p>
+<p>尝试了复杂的 V2Ray ，无果，于是接着尝试 Brook，最终效果还不错，能看 YouTube 1080P 的视频。</p>
+<p><img src="https://wx3.sinaimg.cn/large/0072GPWsgy1g0cx7s9i3hj30l10b9t9w.jpg" alt="image"></p>
+<h3 id="购买-VPS"><a href="#购买-VPS" class="headerlink" title="购买 VPS"></a>购买 VPS</h3><p>VPS(Vistual Private Server)，这个就不详细说了，我也是跟随大流，去 <a href="https://vultr.com/" target="_blank" rel="noopener">Vultr</a> 买的。各家有各家的方法，关键要的是那台服务器。这里就以 Vultr 的举例了。</p>
+<p>地区选择日本东京、美国西海岸等地区，系统最好选择 Linux 的 (我选的是 Ubuntu)，价位自己选 (我用 Vultr 送的 50 刀买了个稍微贵点的)，最后输入服务器名，点击 <code>Deploy Now</code> 就可以了。</p>
+<p><img src="https://ws4.sinaimg.cn/large/0072GPWsgy1g0cxohafeqj30y109dq3f.jpg" alt="image"></p>
+<p>再点进详情页面，就能看到自己服务器的 IP 地址和密码，</p>
+<p><img src="https://ws3.sinaimg.cn/large/0072GPWsgy1g0cxrt2ktaj30lw08k74r.jpg" alt="image"></p>
+<h3 id="连接服务器"><a href="#连接服务器" class="headerlink" title="连接服务器"></a>连接服务器</h3><p>正式连接服务器之前可以用命令行 <code>ping</code> 一下服务器的 IP，看能不能通或者延时怎么样？如果不通或者对延时不满意，可以 <code>Desdroy</code> 掉这台服务器，然后再开一台。然后，开心就好。</p>
+<p>Linux 系统就没有那么费事了，直接就能连了，Windows 的话，用 <a href="https://gitforwindows.org/" target="_blank" rel="noopener">Git Bash</a> 吧！安装 Git 就不说了，因为我之前就已经安装好了，直接在桌面上右键 <code>Git Bash Here</code> 就好。</p>
+<p>输入 <code>ssh root@服务器IP</code>，如果跟下图一样，输入 <code>yes</code>，再输入服务器密码，出现下图就表示连接成功，</p>
+<p><img src="https://ws3.sinaimg.cn/large/0072GPWsgy1g0cy5wv7r7j30pe0eh0ts.jpg" alt="image"></p>
+<h3 id="安装-BBR-加速器"><a href="#安装-BBR-加速器" class="headerlink" title="安装 BBR 加速器"></a>安装 BBR 加速器</h3><p>CV (复制粘贴) 一下代码：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh &amp;&amp; chmod +x bbr.sh &amp;&amp; ./bbr.sh</span><br></pre></td></tr></table></figure>
+
+<p>安装成功，可输入 <code>uname -r</code> 查看版本。</p>
+<p><img src="https://ws2.sinaimg.cn/large/0072GPWsgy1g0cydlfxd5j30pj0iq75z.jpg" alt="image"></p>
+<h3 id="安装-Brook"><a href="#安装-Brook" class="headerlink" title="安装 Brook"></a>安装 Brook</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">wget -N --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubi/doubi/master/brook.sh &amp;&amp; chmod +x brook.sh &amp;&amp; bash brook.sh</span><br></pre></td></tr></table></figure>
+
+<p>输入 <code>1</code> 安装 Brook；</p>
+<p>端口号在范围内都可以，记住就好；</p>
+<p>密码自己决定，记住就好；</p>
+<p>协议选 <code>1</code> 吧，毕竟是新版。</p>
+<p><img src="https://wx4.sinaimg.cn/large/0072GPWsgy1g0cyne27kbj30ns070wer.jpg" alt="image"></p>
+<p>至此，服务器端的事情基本完成。</p>
+<h3 id="Brook-客户端"><a href="#Brook-客户端" class="headerlink" title="Brook 客户端"></a>Brook 客户端</h3><p>逗比途径就算了，上 GitHub 吧。</p>
+<p><a href="https://github.com/txthinking/brook" target="_blank" rel="noopener">Brook Client</a></p>
+<p><img src="https://wx2.sinaimg.cn/large/0072GPWsgy1g0cyupibexj30iw06xdg5.jpg" alt="image"></p>
+<p>随便找个临时 VPN 下吧，我下的时候国内网丝毫不动，挂着 VPN 一点一点的磨完的，70+M 的东西，下的我无比烦躁。</p>
+<p>我这里只有 <code>v20190205</code> 版本的，至少最近一段时间还能用。</p>
+<p>链接: <a href="https://pan.baidu.com/s/1yFLicNSL5W-T5z_TULy5iw" target="_blank" rel="noopener">https://pan.baidu.com/s/1yFLicNSL5W-T5z_TULy5iw</a> </p>
+<p>提取码: pdj8 </p>
+<p>下完就运行，server 按照 <code>IP地址:端口号</code> 的形式填入，例如 <code>127.0.0.1:1080</code> ，填入服务器密码，最后 <code>save</code>。</p>
+<p><img src="https://wx3.sinaimg.cn/large/0072GPWsgy1g0cz1jar0oj30j20g00sy.jpg" alt="image"></p>
+<p>最后右键小图标，<code>start</code> 一下，就可以遨游在墙外了。</p>
+<h3 id="小提示"><a href="#小提示" class="headerlink" title="小提示"></a>小提示</h3><p>社会主义核心价值观不用说了吧，维护国家权益不用说了吧，拥护党的领导也不用说了吧。</p>
+<p>什么小片片就别去看了，涉及政治的也别去参一脚，反动啊，暴力啥的，自己也要有抵制力。</p>
+<p>现在这个互联网时代 (除非不上网)，大家都是裸奔，干什么啊，悠着点。</p>
+<h3 id="外话"><a href="#外话" class="headerlink" title="外话"></a>外话</h3><p>写给我自己：</p>
+<p>再折腾一下失败了的 V2Ray；</p>
+<p>多写 Blog 啊！管它什么乱七八糟的，干就完了！</p>
+<br>
+
+<p>哈哈哈！终于能看到英语解说的 NBA 了！</p>
+<p>我在 <a href="https://www.reddit.com/r/nbastreams/" target="_blank" rel="noopener">Reddit</a> 上找到了一个 NBA 直播的分享，上面据说每天的每场比赛都有人分享直播，至少今天 (2/22) 是这样的。</p>
+<p>Reddit 上也写着，广告还是有的，清晰度就看网速了，反正我看的是最好的那个，感觉还可以。</p>
+<p>英文解说，<del>虽然我听不懂</del></p>
+<p><img src="https://wx1.sinaimg.cn/large/0072GPWsgy1g0ezjf9wm2j30tf0h1khd.jpg" alt="image"></p>
+<p>我只测试了今天的两场比赛，其他应该也是可以的：</p>
+<p><img src="https://ws2.sinaimg.cn/large/0072GPWsgy1g0ezkc4bv7j311u0h9b29.jpg" alt="image"></p>
+<p><img src="https://wx2.sinaimg.cn/large/0072GPWsgy1g0ezkilf77j311j0gk7wh.jpg" alt="image"></p>
+<p>腾讯体育普通会员 30 块一个月，联盟通 90 ，现在看起来，似乎差不多啊！</p>
+]]></content>
+      <categories>
+        <category>GFW</category>
+      </categories>
+      <tags>
+        <tag>Brook</tag>
+        <tag>VPN</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>2018四川省赛-西科大游记</title>
+    <url>/2018/06/03/2018%E5%9B%9B%E5%B7%9D%E7%9C%81%E8%B5%9B-%E8%A5%BF%E7%A7%91%E5%A4%A7%E6%B8%B8%E8%AE%B0/</url>
+    <content><![CDATA[<p>$\quad$ 为什么要说是游记呢？因为这次是真的去游的。。。</p>
+<hr>
+<h3 id="Day1"><a href="#Day1" class="headerlink" title="Day1:"></a>Day1:</h3><p>$\quad$ 坐校车去西科大。到了之后，看到酒店比西安的好，心里多少有点开心。</p>
+<p>$\quad$ 签完到，拿了餐票，可能是我们去晚了，没什么吃的了，所以中午就没吃什么。</p>
+<p>$\quad$ 准备打热身赛，过去看到，居然在人家图书馆里打！我还真的是第一次在图书馆里打比赛！看到那些自习的人，都不好意思大声说话。</p>
+<p>$\quad$ 热身赛，过去看到一道原题博弈，要不是原题估计就难了；看着大佬们纷纷AK离场，我们还是两题；一道暴力匹配题，暴力T一发，KMP也T一发，后来发现没清空！最后一道题还是陈大佬过来讲了思路才过的。</p>
+<p>$\quad$ 之后他们去吃饭，我去找我同学去了，出去搂了一顿。吃完闲聊一路，最后他们回去了。</p>
+<p>$\quad$ 后来跟我老同桌—-小米见了一面 ，逛了逛校园。他们学校四分之一都比我们学校大，我们就逛了一个角。回去了。</p>
+<p>$\quad$ 超市酸奶，酒店躺尸。</p>
+<p>$\quad$ 轻音乐走起，睡觉。</p>
+<hr>
+<p>$\quad$ 热身赛打崩了，正式赛会打好。显然是假的啊！</p>
+<hr>
+<h3 id="Day2"><a href="#Day2" class="headerlink" title="Day2:"></a>Day2:</h3><p>$\quad$ 混沌起床，床太软，睡得腰疼。</p>
+<p>$\quad$ 早餐精致，比西安强。过去，打比赛。</p>
+<p>$\quad$ 开始看到一道E题(关于日期的)，感觉可写。随后卡题，开场五分钟一直卡到结束。哈哈哈！</p>
+<p>$\quad$ 其他题都是在搞E的途中过的。</p>
+<p>$\quad$ 要是E能一开始就想到那个点，说不定会打得好很多；不过，哪有这么多要是？</p>
+<p>$\quad$ 最后混了一个银，不过，这个银，感觉和去年打铁是一样的。</p>
+<p>$\quad$ 233</p>
+<p>$\quad$ 在考虑。。。157156128144128。。。</p>
+<p>$\quad$ 回去一路睡觉。</p>
+<p>$\quad$ 结束了！准备预习。</p>
+<hr>
+<h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><p>$\quad$ 题意读不清楚是我们队的一个大问题！</p>
+<p>$\quad$ 这个问题不是一次两次了！不管是训练赛，还是出去打比赛，都遇到过这个问题 (又让我想起了西安 ) 。</p>
+<p>$\quad$ 训练赛读不明白题意，还有得问，出去就直接凉凉了。</p>
+<p>$\quad$ 总的来说，还是菜！</p>
+]]></content>
+      <categories>
+        <category>杂</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>Manacher</title>
+    <url>/2018/05/02/Manacher/</url>
+    <content><![CDATA[<h3 id="用途："><a href="#用途：" class="headerlink" title="用途："></a>用途：</h3><p>给一个字符串，求它的最长回文子串；比如：</p>
+<p>$\qquad$ <code>s = &quot;abbacbca&quot;</code>，最长回文子串为 <code>&quot;acbca&quot;</code>，长度为 $5$；</p>
+<p>如果用暴力的算法，枚举对称轴，向两边延伸；复杂度高达 $O(n^2)$ !</p>
+<p>有个叫 Manacher 的人发明了一种算法，可以 $O(n)$ 的求出最长回文子串，就叫 Manacher 算法(俗称 马拉车算法)；</p>
+<h3 id="算法详情："><a href="#算法详情：" class="headerlink" title="算法详情："></a>算法详情：</h3><h4 id="预处理："><a href="#预处理：" class="headerlink" title="预处理："></a>预处理：</h4><p>回文串分为 奇回文串(如 <code>&quot;acbca&quot;</code>) 和 偶回文串(如 <code>&quot;abba&quot;</code>)；</p>
+<p>处理的时候判奇偶是一件很麻烦的事，所以用一个小技巧对原串进行预处理：</p>
+<p>在头尾以及两两字符中间都插入一个<strong>无关字符</strong> (没有出现在这个串中的字符)；</p>
+<p>举个例子：<code>&quot;abcd&quot;</code> 填充之后 变为 <code>&quot;#a#b#c#d#&quot;</code>；只要是无关字符都可以用来填充；</p>
+<p>偶回文串 <code>&quot;abba&quot;</code> 处理后变为 <code>&quot;#a#b#b#a#&quot;</code>，奇回文串 <code>&quot;acbca&quot;</code> 处理后变为 <code>&quot;#a#c#b#c#a#&quot;</code>，长度都变成了<strong>奇数</strong>；</p>
+<h4 id="p-的定义："><a href="#p-的定义：" class="headerlink" title="p[] 的定义："></a>p[] 的定义：</h4><p>首先定义一个 $p$ 数组：</p>
+<p>$\quad \bullet$  $p[i]$ 表示以 $i$ 为中心的回文串的最大回文半径。</p>
+<p>比如：</p>
+<table>
+<thead>
+<tr>
+<th>i</th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+<th>9</th>
+<th>10</th>
+<th>11</th>
+<th>12</th>
+<th>13</th>
+<th>14</th>
+<th>15</th>
+<th>16</th>
+<th>17</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>New</td>
+<td>@</td>
+<td>#</td>
+<td>a</td>
+<td>#</td>
+<td>b</td>
+<td>#</td>
+<td>b</td>
+<td>#</td>
+<td>a</td>
+<td>#</td>
+<td>c</td>
+<td>#</td>
+<td>b</td>
+<td>#</td>
+<td>c</td>
+<td>#</td>
+<td>a</td>
+<td>#</td>
+</tr>
+<tr>
+<td>p[i]</td>
+<td></td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+<td>5</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>6</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+</tr>
+</tbody></table>
+<h4 id="求解p"><a href="#求解p" class="headerlink" title="求解p[]"></a>求解p[]</h4><p>假设我们正在求 $p[i]$，即 $p[1, \cdots, i-1]$ 都已求出；</p>
+<p>新增两个变量 Mr 和 Mid，定义如下：</p>
+<ul>
+<li><p><strong>Mr :</strong> 中心在 $i​$ 之前的所有回文子串，所能延伸至的<strong>最右端</strong>的位置；</p>
+</li>
+<li><p><strong>Mid :</strong> 右端延伸至 <strong>Mr</strong> 处的回文子串的<strong>中心位置</strong>；<br>即 <strong>Mid + p[Mid] = Mr</strong>；</p>
+</li>
+</ul>
+<p>假设变量的相对位置如图：</p>
+<p>(1) <strong>if (i &lt; Mr)</strong><br>即以 Mid 为中心的回文串为黑色的那段覆盖了红色的两段，</p>
+<p>根据回文串的性质，有 <strong>以 j 为中心</strong> 的回文串 和 <strong>以 i 为中心</strong> 的回文串相等，即图中红色两段相等；</p>
+<p>既然这样，就不用以 $i$ 为中心向两边延伸了，直接 <code>p[i] = p[j]</code> ，加速查找；<br><img src="http://wx1.sinaimg.cn/large/0072GPWsgy1g19kq33qdfj30ro09974b.jpg" alt="这里写图片描述"></p>
+<p>(2) <strong>else</strong><br>即 $i$ 在 Mr 右边，这种情况，只能老老实实向两边延伸了；<br><img src="https://wx2.sinaimg.cn/large/0072GPWsly1g1exooxoixj30qs05b3yc.jpg" alt="image"></p>
+<h4 id="参考代码："><a href="#参考代码：" class="headerlink" title="参考代码："></a>参考代码：</h4><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**********************************************</span></span><br><span class="line"><span class="comment"> *Author*        :XzzF</span></span><br><span class="line"><span class="comment"> *Created Time*  : 2018/4/12 16:42:30</span></span><br><span class="line"><span class="comment"> *Ended  Time*  : 2018/4/12 16:57:48</span></span><br><span class="line"><span class="comment">*********************************************/</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstdio&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstring&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cmath&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstdlib&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">long</span> <span class="keyword">long</span> LL;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> inf = <span class="number">1</span> &lt;&lt; <span class="number">30</span>;</span><br><span class="line"><span class="keyword">const</span> LL INF = <span class="number">1L</span>L &lt;&lt; <span class="number">60</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> MaxN = <span class="number">110005</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> s[MaxN + <span class="number">5</span>];</span><br><span class="line"><span class="keyword">char</span> New_s[<span class="number">2</span> * MaxN + <span class="number">5</span>];  <span class="comment">//填充字符之后的串</span></span><br><span class="line"><span class="keyword">int</span> p[<span class="number">2</span> * MaxN + <span class="number">5</span>];  <span class="comment">//p[i]表示以i为中心的最长回文串半径</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Get_New</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> len = <span class="built_in">strlen</span>(s);</span><br><span class="line">	New_s[<span class="number">0</span>] = <span class="string">'@'</span>; New_s[<span class="number">1</span>] = <span class="string">'#'</span>;</span><br><span class="line">	<span class="keyword">int</span> L = <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; len; i++) &#123;</span><br><span class="line">		New_s[++L] = s[i];</span><br><span class="line">		New_s[++L] = <span class="string">'#'</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	New_s[L + <span class="number">1</span>] = <span class="string">'\0'</span>;   <span class="comment">//不要忘了</span></span><br><span class="line">	<span class="keyword">return</span> L;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Manacher</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> len = Get_New();</span><br><span class="line">	<span class="keyword">int</span> Max_len = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">int</span> Mr = <span class="number">0</span>;       <span class="comment">//遍历过的所有回文串中,所能到达的最右端的位置</span></span><br><span class="line">	<span class="keyword">int</span> Mid = <span class="number">0</span>;       <span class="comment">//能到达最右端位置的回文串的中心位置</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= len; i++) &#123;</span><br><span class="line">		<span class="keyword">if</span>(i &lt; Mr) </span><br><span class="line">			p[i] = min(p[<span class="number">2</span> * Mid - i], Mr - i);</span><br><span class="line">		<span class="keyword">else</span> p[i] = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">		<span class="comment">//不需边界判断,因为左有'@',右有'\0'</span></span><br><span class="line">		<span class="keyword">while</span>(New_s[i - p[i]] == New_s[i + p[i]])</span><br><span class="line">			p[i]++;</span><br><span class="line"></span><br><span class="line">		<span class="comment">//更新Mr</span></span><br><span class="line">		<span class="keyword">if</span>(Mr &lt; i + p[i]) &#123;</span><br><span class="line">			Mid = i;</span><br><span class="line">			Mr = i + p[i];</span><br><span class="line">		&#125;</span><br><span class="line">		Max_len = max(Max_len, p[i] - <span class="number">1</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> Max_len;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">while</span>(<span class="built_in">scanf</span>(<span class="string">"%s"</span>, s) != EOF)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"%d\n"</span>, Manacher());</span><br><span class="line">	&#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="算法复杂度分析："><a href="#算法复杂度分析：" class="headerlink" title="算法复杂度分析："></a>算法复杂度分析：</h3><p>算法复杂度主要来自于那两个循环，外层 <code>for()</code> 循环就不说了，少不了的；主要看里面的 <code>while()</code> 循环进去多少次？ <code>i &gt; Mr</code> 必定会进入 <code>while()</code> 循环，就不看了；</p>
+<h4 id="i-lt-Mr-时的各种情况分析："><a href="#i-lt-Mr-时的各种情况分析：" class="headerlink" title="i &lt;= Mr 时的各种情况分析："></a><code>i &lt;= Mr</code> 时的各种情况分析：</h4><p>当 <code>i &lt;= Mr</code> 时，主要会遇到以下几种情况：</p>
+<p>前提条件：那段黑色的表示以 <code>Mid</code> 为中心的回文串；</p>
+<p>下文中 “回文串x” 表示 <strong>以x为中心</strong> 的回文串；</p>
+<h5 id="回文串-j-全部在-回文串-Mid-内部："><a href="#回文串-j-全部在-回文串-Mid-内部：" class="headerlink" title="回文串 j 全部在 回文串 Mid 内部："></a>回文串 j 全部在 回文串 Mid 内部：</h5><p>对于这种情况，在<code>while()</code> 之前会有 <code>p[i] = p[j]</code> ；如果会进入 <code>while()</code> 循环，那么 回文串 i 的半径一定会有增量，假设增量为图中绿色那段；</p>
+<p>由回文串的性质可得，a = b = c = d ；那么，目前的 $p[j]$ 就等于 紫线+绿线，与原始 $p[j]$ 的定义矛盾！</p>
+<p>所以，这种情况不会进入 <code>while()</code> 循环；</p>
+<p><img src="http://wx2.sinaimg.cn/large/0072GPWsgy1g19kq49bp7j30s706vgli.jpg" alt="这里写图片描述"></p>
+<h5 id="回文串-j-部分在-回文串-Mid-之外："><a href="#回文串-j-部分在-回文串-Mid-之外：" class="headerlink" title="回文串 j 部分在 回文串 Mid 之外："></a>回文串 j 部分在 回文串 Mid 之外：</h5><p>对于这种情况，在 <code>while()</code> 之前就会有 <code>p[i] = Mr - i</code>；如果会进入 <code>while()</code> 循环，回文串 i 的半径同样会有增量，同样设为图中绿色那段；</p>
+<p>同理可得，a = b = c = d ；那么 $p[Mid]$ 就等于 黑线+绿线，同样与原始的 $p[Mid]$ 定义矛盾！</p>
+<p>所以，这种情况也不会进入 <code>while()</code> 循环；</p>
+<p><img src="http://wx4.sinaimg.cn/large/0072GPWsgy1g19kq4wwb4j30od08mdfs.jpg" alt="这里写图片描述"></p>
+<h5 id="回文串-j-的左端正好和-回文串-Mid-的左端重合："><a href="#回文串-j-的左端正好和-回文串-Mid-的左端重合：" class="headerlink" title="回文串 j 的左端正好和 回文串 Mid 的左端重合："></a>回文串 j 的左端正好和 回文串 Mid 的左端重合：</h5><p>对于这种情况，<code>p[i] = Mr - i</code> 之后，依旧有可能增加，所以会进入 <code>while()</code> 循环；</p>
+<p><img src="http://wx4.sinaimg.cn/large/0072GPWsgy1g19kq5jljfj30lb061q2s.jpg" alt="这里写图片描述"></p>
+<h4 id="一本正经的假分析："><a href="#一本正经的假分析：" class="headerlink" title="一本正经的假分析："></a>一本正经的假分析：</h4><p>首先明确，<code>Mr</code> 是<strong>递增</strong>的！且当 <code>Mr</code> 等于右边界时，就不会再进入 <code>while()</code> 循环了！</p>
+<p>在算法过程中，只要进入 <code>while()</code> 循环，一定会使得 <code>Mr</code> 增加！而且， <code>while()</code> 循环进行多少次 <code>Mr</code> 就会增加多少；</p>
+<p>也就是说，在最坏的情况下，<code>Mr</code> 最多增加 $len$ 次，也就等价于内层 <code>while()</code> 循环最多执行 $len$ 次；加上外层循环的 $len$ 次，最坏为 $2 * len$ 次；</p>
+<p>其中，$len$ 为填充后的串的长度，即 $len = 2n$，$T_{worst} = O(4n)$ ， 所以，算法复杂度为 $O(n)$ 。</p>
+<h4 id="实践出真知："><a href="#实践出真知：" class="headerlink" title="实践出真知："></a>实践出真知：</h4><p>定义一个变量 <code>cnt</code> ；在外层 <code>for()</code> 循环下面 和 内层 <code>while()</code> 下面各写上一句 <code>cnt++;</code> 最后输出看看 <code>cnt</code> 的值：</p>
+<table>
+<thead>
+<tr>
+<th>s</th>
+<th>cnt</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>aaaaaaaaa</td>
+<td>36</td>
+</tr>
+<tr>
+<td>ababababa</td>
+<td>35</td>
+</tr>
+<tr>
+<td>abcdefghi</td>
+<td>28</td>
+</tr>
+<tr>
+<td>abbacabab</td>
+<td>34</td>
+</tr>
+</tbody></table>
+<p>还是不错的吧！</p>
+]]></content>
+      <categories>
+        <category>ACM</category>
+      </categories>
+      <tags>
+        <tag>字符串</tag>
+        <tag>Manacher</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>KMP</title>
+    <url>/2018/04/26/KMP/</url>
+    <content><![CDATA[<p>最近学习了一下 KMP 算法，写一下总结，免得忘了。</p>
+<h3 id="KMP算法："><a href="#KMP算法：" class="headerlink" title="KMP算法："></a>KMP算法：</h3><h4 id="暴力匹配的浪费："><a href="#暴力匹配的浪费：" class="headerlink" title="暴力匹配的浪费："></a>暴力匹配的浪费：</h4><p>  假设正在进行下图这样的匹配 :</p>
+<p><img src="http://wx1.sinaimg.cn/large/0072GPWsgy1g19kpoys12j30b0037jr8.jpg" alt="这里写图片描述"></p>
+<p>  暴力匹配一旦匹配失败，模式串就会回退到开头进行匹配；<br>  我们可以看到，失配字符 <strong>‘C’</strong> 的前两个字符 <strong>(AB)</strong> 和开头 <strong>(AB)</strong> 是一样的，如果挪到开头去匹配，很明显会进行一些不必要的匹配；<br>  显然，将箭头所指字符与失配处进行匹配才是 <strong>比较</strong> 优的。<br><img src="http://wx3.sinaimg.cn/large/0072GPWsgy1g19kpp6uf1j30dr02uweb.jpg" alt="这里写图片描述"></p>
+<p>  KMP 算法就是基于这个思想的。只要知道有<strong>前缀与后缀匹配</strong> 的 <strong>最大</strong>长度，那某个位置失配之后，就能迅速的像上面那样跳到一个 <strong>比较</strong> 优的位置进行匹配。<br>  为什么是 “比较优” ？后面再说。</p>
+<h4 id="什么叫-“前缀和后缀匹配”"><a href="#什么叫-“前缀和后缀匹配”" class="headerlink" title="什么叫 “前缀和后缀匹配” ?"></a>什么叫 “前缀和后缀匹配” ?</h4><p>  对于一个位置 $i$ ，如果 $str[0, k - 1] = str[i - k, i - 1] $，那么就说 $i$ 位置前缀匹配后缀的最大长度为 $k$ ；我们用 $Next$ 数组存起来，即 $Next[i] = k$ ；<br>  那么，对 $Next[]$ 下个定义：</p>
+<p>  $\bullet ; Next[i] : \quad str[0, i - 1]$ 中前缀匹配后缀的最大长度。</p>
+<p>  如果我们计算出了模式串 $P$ 的每个 $Next[i]$ ，那么在 $pos$ 位置处失配时，立马就可以跳到 $Next[pos]$ 处进行匹配；<br>  所以，$Next$ 数组还可以这样理解：</p>
+<p>  $\bullet ; Next[i] : \quad$ 当 $i$ 位置失配时应该跳往的匹配位置。</p>
+<p>  比如上面的模式串 $P$ :</p>
+<table>
+<thead>
+<tr>
+<th>i</th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>P</td>
+<td>A</td>
+<td>B</td>
+<td>D</td>
+<td>C</td>
+<td>A</td>
+<td>B</td>
+<td>C</td>
+<td>‘\0’</td>
+</tr>
+<tr>
+<td>Next</td>
+<td>-1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>0</td>
+</tr>
+</tbody></table>
+<p>$\quad i = 0$，对于模式串的首字符，我们统一为 $Next[0] = -1$；<br>$\quad i = 1$，前面的字符串为 $A$，其最长相同真前后缀长度为 $0$，即 $Next[1] = 0$；<br>$\quad i = 2$，前面的字符串为 $AB$，其最长相同真前后缀长度为 $0$，即 $Next[2] = 0$；<br>$\quad i = 3$，前面的字符串为 $ABD$，其最长相同真前后缀长度为 $0$，即 $Next[3] = 0$；<br>$\quad i = 4$，前面的字符串为 $ABDC$，其最长相同真前后缀长度为 $0$，即 $Next[4] = 0$；<br>$\quad i = 5$，前面的字符串为 $\color{red}{A}BDC\color{red}{A}$，其最长相同真前后缀为 $A$，即 $Next[5] = 1$；<br>$\quad i = 6$，前面的字符串为 $\color{red}{AB}DC\color{red}{AB}$，其最长相同真前后缀为 $AB$，即 $Next[6] = 2$；<br>$\quad i = 7$，前面的字符串为 $ABDCABC$，其最长相同真前后缀长度为 $0$，即 $Next[7] = 0$。</p>
+<p>  还是开始那个例子，当 $i = 6$ 时，失配，立马就可以跳到 $i = 2$ 的位置进行匹配； faster了有没有？</p>
+<h4 id="如何求Next数组"><a href="#如何求Next数组" class="headerlink" title="如何求Next数组?"></a>如何求Next数组?</h4><p>  假设我们现在正在计算 $Next[i]$ ，即之前的 $Next[0, \ldots , i-1]$ 已经得到了；<br>  先上代码：</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Get_Next</span><span class="params">(<span class="built_in">string</span> P)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">memset</span>(Next, <span class="number">0</span>, <span class="keyword">sizeof</span>(Next));</span><br><span class="line">	<span class="keyword">int</span> P_len = P.length();</span><br><span class="line">	<span class="keyword">int</span> i = <span class="number">0</span>;   <span class="comment">//当前枚举的位置</span></span><br><span class="line">	<span class="keyword">int</span> p = <span class="number">-1</span>;   <span class="comment">//上一次前后缀匹配的最大长度+1,说白了就是Next[i-1]的后一位</span></span><br><span class="line">	Next[<span class="number">0</span>] = <span class="number">-1</span>;</span><br><span class="line">	<span class="keyword">while</span>(i &lt; P_len) &#123;</span><br><span class="line">		<span class="keyword">if</span>(p == <span class="number">-1</span> || P[i] == P[p]) &#123;</span><br><span class="line">			i++;</span><br><span class="line">			p++;</span><br><span class="line">			Next[i] = p;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> p = Next[p];</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>  代码中最重要的就是那个 <strong>if…else…</strong> 语句；<br>  一脸懵逼？？？不怕，上图：<br><img src="http://wx2.sinaimg.cn/large/0072GPWsgy1g19kppccjdj30p804aq2s.jpg" alt="这里写图片描述"></p>
+<p>  假设 $i$ 和 $p$ 的位置如上图，上一次前后缀匹配的最大长度为 $p-1$，即绿色的两个椭圆是相等的；<br>  (1)  <strong>if (P[i] == P[p]) ** ，则往后走就是了；<br>$\qquad$ p == -1 又是为什么呢？一是 p 初始化为-1，总得往后走吧！二是当前后缀匹配长度为 0 时，p会为-1，这时候也得往后走；<br>  (2) **else</strong><br><img src="http://wx1.sinaimg.cn/large/0072GPWsgy1g19kpphgd6j30pu05bjra.jpg" alt="这里写图片描述"></p>
+<p>  由 $Next[p]$ 的定义可知，前两个绿色的椭圆是相等的；于是可知第 $1$ 个和第 $4$ 个椭圆是相等的；<br>  因此，令 $p=Next[p]$ 来加速匹配；</p>
+<h4 id="完整代码："><a href="#完整代码：" class="headerlink" title="完整代码："></a>完整代码：</h4><p>  这其实是一道题：<a href="http://acm.hdu.edu.cn/showproblem.php?pid=2087" target="_blank" rel="noopener">HDU-2087</a></p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**********************************************</span></span><br><span class="line"><span class="comment"> *Author*        :XzzF</span></span><br><span class="line"><span class="comment"> *Created Time*  : 2018/4/26 7:07:32</span></span><br><span class="line"><span class="comment"> *Ended  Time*  : 2018/4/26 12:56:37</span></span><br><span class="line"><span class="comment">*********************************************/</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstdio&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstring&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cmath&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstdlib&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">long</span> <span class="keyword">long</span> LL;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> inf = <span class="number">1</span> &lt;&lt; <span class="number">30</span>;</span><br><span class="line"><span class="keyword">const</span> LL INF = <span class="number">1L</span>L &lt;&lt; <span class="number">60</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> MaxN = <span class="number">10005</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">string</span> S, P;</span><br><span class="line"><span class="keyword">int</span> Next[MaxN + <span class="number">5</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Get_Next</span><span class="params">(<span class="built_in">string</span> P)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">memset</span>(Next, <span class="number">0</span>, <span class="keyword">sizeof</span>(Next));</span><br><span class="line">	<span class="keyword">int</span> P_len = P.length();</span><br><span class="line">	<span class="keyword">int</span> i = <span class="number">0</span>;     <span class="comment">//当前枚举的位置</span></span><br><span class="line">	<span class="keyword">int</span> p = <span class="number">-1</span>;  <span class="comment">//上一次前后缀匹配的最大长度+1,说白了就是Next[i-1]的后一位</span></span><br><span class="line">	Next[<span class="number">0</span>] = <span class="number">-1</span>;</span><br><span class="line">	<span class="keyword">while</span>(i &lt; P_len) &#123;</span><br><span class="line">		<span class="keyword">if</span>(p == <span class="number">-1</span> || P[i] == P[p]) &#123;</span><br><span class="line">			i++;</span><br><span class="line">			p++;</span><br><span class="line">			Next[i] = p;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> p = Next[p];</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">KMP</span><span class="params">(<span class="built_in">string</span> S, <span class="built_in">string</span> P)</span> </span>&#123;</span><br><span class="line">	Get_Next(P);</span><br><span class="line">	<span class="keyword">int</span> i = <span class="number">0</span>;      <span class="comment">//index of S</span></span><br><span class="line">	<span class="keyword">int</span> j = <span class="number">0</span>;      <span class="comment">//index of P</span></span><br><span class="line">	<span class="keyword">int</span> cnt = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">while</span>(i &lt; S.length() ) &#123;</span><br><span class="line">		<span class="keyword">if</span>(j == <span class="number">-1</span> || S[i] == P[j]) &#123;</span><br><span class="line">			i++;</span><br><span class="line">			j++;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> j = Next[j];</span><br><span class="line">		<span class="keyword">if</span>(j == P.length()) &#123;</span><br><span class="line">			j = <span class="number">0</span>;    <span class="comment">//不相交匹配则为0,相交匹配则为Next[j]</span></span><br><span class="line">			cnt++;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> cnt;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">while</span>(<span class="built_in">cin</span> &gt;&gt; S &gt;&gt; P) &#123;</span><br><span class="line">		<span class="keyword">if</span>(S[<span class="number">0</span>] == <span class="string">'#'</span>) <span class="keyword">break</span>;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"%d\n"</span>, KMP(S, P));</span><br><span class="line">	&#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="KMP优化"><a href="#KMP优化" class="headerlink" title="KMP优化:"></a>KMP优化:</h3><p>  上面还有一个问题没有解决，为什么说 “比较优” ?</p>
+<h4 id="问题所在："><a href="#问题所在：" class="headerlink" title="问题所在："></a>问题所在：</h4><p>  其实一开始那个表格就能看到问题了，但还是看个”严重”点的吧！</p>
+<table>
+<thead>
+<tr>
+<th>i</th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+<th>9</th>
+<th>10</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>P</td>
+<td>A</td>
+<td>B</td>
+<td>A</td>
+<td>C</td>
+<td>D</td>
+<td>A</td>
+<td>B</td>
+<td>A</td>
+<td>C</td>
+<td>E</td>
+<td>‘\0’</td>
+</tr>
+<tr>
+<td>Next</td>
+<td>-1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>0</td>
+</tr>
+</tbody></table>
+<p>  假设 $i=8$ 时失配，按照之前的KMP算法，就会把 $p=3$ 处的字符拿过来匹配；然而，这两个字符是相同的，就增加了一些不必要的匹配；<br>  稍微修改一下代码就能解决这个问题：</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Get_Nextval</span><span class="params">(<span class="built_in">string</span> P)</span> </span>&#123;   <span class="comment">//KMP优化</span></span><br><span class="line">    <span class="keyword">int</span> P_len = P.size();</span><br><span class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;   <span class="comment">// P 的下标</span></span><br><span class="line">    <span class="keyword">int</span> p = <span class="number">-1</span>;  </span><br><span class="line">    Nextval[<span class="number">0</span>] = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (i &lt; P_len)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (p == <span class="number">-1</span> || P[i] == P[p])</span><br><span class="line">        &#123;</span><br><span class="line">            i++;</span><br><span class="line">            p++;</span><br><span class="line">          </span><br><span class="line">            <span class="keyword">if</span> (P[i] != P[p])</span><br><span class="line">                Nextval[i] = p;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                Nextval[i] = Nextval[p];  <span class="comment">//既然相同就继续往前找</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            p = Nextval[p];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>i</th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+<th>9</th>
+<th>10</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>P</td>
+<td>A</td>
+<td>B</td>
+<td>A</td>
+<td>C</td>
+<td>D</td>
+<td>A</td>
+<td>B</td>
+<td>A</td>
+<td>C</td>
+<td>E</td>
+<td>‘\0’</td>
+</tr>
+<tr>
+<td>Next</td>
+<td>-1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Nextval</td>
+<td>-1</td>
+<td>0</td>
+<td>-1</td>
+<td>1</td>
+<td>0</td>
+<td>-1</td>
+<td>0</td>
+<td>-1</td>
+<td>1</td>
+<td>4</td>
+<td>0</td>
+</tr>
+</tbody></table>
+<p>  优化之后，当 $i=8$ 失配时，就能直接跳到 $p=1$ 处匹配，faster 了有没有？匹配方式还是没变的；</p>
+<p>  严格来讲，未优化的 KMP 算法叫 MP算法；但一般情况下，未优化的 KMP 算法已经够用了；</p>
+<p>  <strong>KMP算法(未优化)：</strong> $Next[]$ 表示前后缀匹配的最大长度，还有一些骚操作，后面再说；<br>  <strong>KMP算法(优化)：</strong> $Nextval[]$ 表示最优长度，但<strong>不一定是最长</strong>；快是快了，功能少了；</p>
+<p>  <strong>复杂度</strong>：$O(n+m)$  <del>并不会证明</del></p>
+<h3 id="More-about-KMP"><a href="#More-about-KMP" class="headerlink" title="More about KMP :"></a>More about KMP :</h3><h4 id="KMP求最小循环节："><a href="#KMP求最小循环节：" class="headerlink" title="KMP求最小循环节："></a>KMP求最小循环节：</h4><p>现在假设 $i$ 位置之前的字符串是循环的(比如 $str[0, i-1] = aabaab$)  ，我们想求它的最小循环节；</p>
+<p>根据 $Next[]$ 的定义，如果 $i$ 位置 相匹配的前后缀<strong>没有相互覆盖</strong>，显然这个前缀一定不会是循环的，所以我们主要考虑前后缀相互覆盖的情况；</p>
+<p><img src="http://wx3.sinaimg.cn/large/0072GPWsgy1g19kppmkucj30qt088glj.jpg" alt="这里写图片描述"></p>
+<p>  如图所示，$Next[i]$ 为红色那段，然后将后面剩下的那段黑色的定义为 $loop$ ，即 $loop = i - Next[i]$；</p>
+<p>  由于串是在自匹配，所以 $loop$ 是等于后面的两段的；</p>
+<p>  由 $Next[]$ 定义可知，前两段绿线隔出来的串是相等的，后两段绿线隔出来的串也是相等的；</p>
+<p>  那我们把前后两段都砍了；</p>
+<p><img src="http://wx4.sinaimg.cn/large/0072GPWsgy1g19kpqkrw7j30qz07hdfs.jpg" alt="这里写图片描述"></p>
+<p>  这和上面的是一样的嘛！继续砍。。。</p>
+<p><img src="http://wx4.sinaimg.cn/large/0072GPWsgy1g19kpqub5qj30qi06jmx2.jpg" alt="这里写图片描述"></p>
+<p>  砍到最后，剩下的 $4$ 个串都是相等的；自然就可以推出上一次砍掉的 $4$ 个串也是相等的；</p>
+<p>  有点类似于递归回溯的思想；</p>
+<p>  那么，就说明 $loop$ 就是 $i$ 以前的前缀的 <strong>循环节</strong>；</p>
+<p>  再来说为什么是最小的？很简单，</p>
+<p>  $Next[]$ 的定义是什么？前后缀匹配的 <strong>最大</strong> 长度！显然，剩下的 $loop$ 就是最小的啦！</p>
+<p>  既然我们能将每个位置以前的最小循环节求出，那整个串的最小循环节自然就不是问题了；</p>
+<p>  有一道题可以做一下：<a href="http://acm.hdu.edu.cn/showproblem.php?pid=1358" target="_blank" rel="noopener">HDU-1358</a></p>
+<p>  题意就是让从小到大输出哪些位置之前的串是循环的，以及循环次数；</p>
+<p>  参考代码：</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="comment">/********************************************</span></span><br><span class="line"><span class="comment"> *Author*        :XzzF</span></span><br><span class="line"><span class="comment"> *Created Time*  : 2018年04月25日 星期三 21时06分25秒</span></span><br><span class="line"><span class="comment"> * Ended  Time*  : 2018年04月25日 星期三 21时31分56秒</span></span><br><span class="line"><span class="comment">*********************************************/</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstdio&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cmath&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstdlib&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstring&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">long</span> <span class="keyword">long</span> LL;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> inf = <span class="number">1</span> &lt;&lt; <span class="number">30</span>;</span><br><span class="line"><span class="keyword">const</span> LL INF = <span class="number">1L</span>L &lt;&lt; <span class="number">60</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> MaxN = <span class="number">1000000</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n;</span><br><span class="line"><span class="built_in">string</span> S;</span><br><span class="line"><span class="keyword">int</span> Next[MaxN + <span class="number">5</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">GetNext</span><span class="params">(<span class="built_in">string</span> S)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">memset</span>(Next, <span class="number">0</span>, <span class="keyword">sizeof</span>(Next));</span><br><span class="line">	<span class="keyword">int</span> len = S.length();</span><br><span class="line">	<span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">int</span> pos = <span class="number">-1</span>;</span><br><span class="line">	Next[<span class="number">0</span>] = <span class="number">-1</span>;</span><br><span class="line">	<span class="keyword">while</span>(i &lt; len) &#123;</span><br><span class="line">		<span class="keyword">if</span>(pos == <span class="number">-1</span> || S[pos] == S[i]) &#123;</span><br><span class="line">			i++;</span><br><span class="line">			pos++;</span><br><span class="line">			Next[i] = pos;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> pos = Next[pos];</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	ios :: sync_with_stdio(<span class="literal">false</span>);</span><br><span class="line">	<span class="built_in">cin</span>.tie(<span class="number">0</span>); <span class="built_in">cout</span>.tie(<span class="number">0</span>);</span><br><span class="line">	<span class="keyword">int</span> Cas = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">while</span>(<span class="built_in">cin</span> &gt;&gt; n) &#123;</span><br><span class="line">		<span class="keyword">if</span>(n == <span class="number">0</span>) <span class="keyword">break</span>;</span><br><span class="line">		<span class="built_in">cin</span> &gt;&gt; S;</span><br><span class="line">		GetNext(S);</span><br><span class="line">		<span class="built_in">cout</span> &lt;&lt; <span class="string">"Test case #"</span> &lt;&lt; ++Cas &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">			<span class="keyword">int</span> loop = i - Next[i];</span><br><span class="line">			<span class="comment">//i % loop == 0: 得被长度整除才有可能是循环节吧!</span></span><br><span class="line">			<span class="comment">//i != loop: Next[i]==0时也能满足前一个条件,得判掉</span></span><br><span class="line">			<span class="keyword">if</span>(i % loop == <span class="number">0</span> &amp;&amp; i != loop) </span><br><span class="line">				<span class="built_in">cout</span> &lt;&lt; i &lt;&lt; <span class="string">" "</span> &lt;&lt; i / loop &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">			<span class="comment">//i / loop 就是循环次数了</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">cout</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>ACM</category>
+      </categories>
+      <tags>
+        <tag>字符串</tag>
+      </tags>
+  </entry>
+</search>

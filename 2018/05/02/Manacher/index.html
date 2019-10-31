@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" media="all" href="/lib/Han/dist/han.min.css?v=3.3">
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Zoro_32px.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Zoro_16px.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="字符串,Manacher," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="用途：给一个字符串，求它的最长回文子串；比如： $\qquad$ s = &amp;quot;abbacbca&amp;quot;，最长回文子串为 &amp;quot;acbca&amp;quot;，长度为 $5$； 如果用暴力的算法，枚举对称轴，向两边延伸；复杂度高达 $O(n^2)$ ! 有个叫 Manacher 的人发明了一种算法，可以 $O(n)$ 的求出最长回文子串，就叫 Manacher 算法(俗称 马拉车算法)；">
+<meta name="keywords" content="字符串,Manacher">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Manacher">
+<meta property="og:url" content="https:&#x2F;&#x2F;xzzf.github.io&#x2F;2018&#x2F;05&#x2F;02&#x2F;Manacher&#x2F;index.html">
+<meta property="og:site_name" content="XzzF的博客">
+<meta property="og:description" content="用途：给一个字符串，求它的最长回文子串；比如： $\qquad$ s = &amp;quot;abbacbca&amp;quot;，最长回文子串为 &amp;quot;acbca&amp;quot;，长度为 $5$； 如果用暴力的算法，枚举对称轴，向两边延伸；复杂度高达 $O(n^2)$ ! 有个叫 Manacher 的人发明了一种算法，可以 $O(n)$ 的求出最长回文子串，就叫 Manacher 算法(俗称 马拉车算法)；">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http:&#x2F;&#x2F;wx1.sinaimg.cn&#x2F;large&#x2F;0072GPWsgy1g19kq33qdfj30ro09974b.jpg">
+<meta property="og:image" content="https:&#x2F;&#x2F;wx2.sinaimg.cn&#x2F;large&#x2F;0072GPWsly1g1exooxoixj30qs05b3yc.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;wx2.sinaimg.cn&#x2F;large&#x2F;0072GPWsgy1g19kq49bp7j30s706vgli.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;wx4.sinaimg.cn&#x2F;large&#x2F;0072GPWsgy1g19kq4wwb4j30od08mdfs.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;wx4.sinaimg.cn&#x2F;large&#x2F;0072GPWsgy1g19kq5jljfj30lb061q2s.jpg">
+<meta property="og:updated_time" content="2019-03-25T04:38:56.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;wx1.sinaimg.cn&#x2F;large&#x2F;0072GPWsgy1g19kq33qdfj30ro09974b.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xzzf.github.io/2018/05/02/Manacher/"/>
+
+
+
+
+
+  <title>Manacher | XzzF的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">XzzF的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">I will better than 'me'!</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xzzf.github.io/2018/05/02/Manacher/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="XzzF">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/zero.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="XzzF的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Manacher</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-02T10:24:37+08:00">
+                2018-05-02
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2019-03-25T12:38:56+08:00">
+                2019-03-25
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ACM/" itemprop="url" rel="index">
+                    <span itemprop="name">ACM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1.5k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  6
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="用途："><a href="#用途：" class="headerlink" title="用途："></a>用途：</h3><p>给一个字符串，求它的最长回文子串；比如：</p>
+<p>$\qquad$ <code>s = &quot;abbacbca&quot;</code>，最长回文子串为 <code>&quot;acbca&quot;</code>，长度为 $5$；</p>
+<p>如果用暴力的算法，枚举对称轴，向两边延伸；复杂度高达 $O(n^2)$ !</p>
+<p>有个叫 Manacher 的人发明了一种算法，可以 $O(n)$ 的求出最长回文子串，就叫 Manacher 算法(俗称 马拉车算法)；</p>
+<h3 id="算法详情："><a href="#算法详情：" class="headerlink" title="算法详情："></a>算法详情：</h3><h4 id="预处理："><a href="#预处理：" class="headerlink" title="预处理："></a>预处理：</h4><p>回文串分为 奇回文串(如 <code>&quot;acbca&quot;</code>) 和 偶回文串(如 <code>&quot;abba&quot;</code>)；</p>
+<p>处理的时候判奇偶是一件很麻烦的事，所以用一个小技巧对原串进行预处理：</p>
+<p>在头尾以及两两字符中间都插入一个<strong>无关字符</strong> (没有出现在这个串中的字符)；</p>
+<p>举个例子：<code>&quot;abcd&quot;</code> 填充之后 变为 <code>&quot;#a#b#c#d#&quot;</code>；只要是无关字符都可以用来填充；</p>
+<p>偶回文串 <code>&quot;abba&quot;</code> 处理后变为 <code>&quot;#a#b#b#a#&quot;</code>，奇回文串 <code>&quot;acbca&quot;</code> 处理后变为 <code>&quot;#a#c#b#c#a#&quot;</code>，长度都变成了<strong>奇数</strong>；</p>
+<h4 id="p-的定义："><a href="#p-的定义：" class="headerlink" title="p[] 的定义："></a>p[] 的定义：</h4><p>首先定义一个 $p$ 数组：</p>
+<p>$\quad \bullet$  $p[i]$ 表示以 $i$ 为中心的回文串的最大回文半径。</p>
+<p>比如：</p>
+<table>
+<thead>
+<tr>
+<th>i</th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+<th>9</th>
+<th>10</th>
+<th>11</th>
+<th>12</th>
+<th>13</th>
+<th>14</th>
+<th>15</th>
+<th>16</th>
+<th>17</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>New</td>
+<td>@</td>
+<td>#</td>
+<td>a</td>
+<td>#</td>
+<td>b</td>
+<td>#</td>
+<td>b</td>
+<td>#</td>
+<td>a</td>
+<td>#</td>
+<td>c</td>
+<td>#</td>
+<td>b</td>
+<td>#</td>
+<td>c</td>
+<td>#</td>
+<td>a</td>
+<td>#</td>
+</tr>
+<tr>
+<td>p[i]</td>
+<td></td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+<td>5</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>6</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+</tr>
+</tbody></table>
+<h4 id="求解p"><a href="#求解p" class="headerlink" title="求解p[]"></a>求解p[]</h4><p>假设我们正在求 $p[i]$，即 $p[1, \cdots, i-1]$ 都已求出；</p>
+<p>新增两个变量 Mr 和 Mid，定义如下：</p>
+<ul>
+<li><p><strong>Mr :</strong> 中心在 $i​$ 之前的所有回文子串，所能延伸至的<strong>最右端</strong>的位置；</p>
+</li>
+<li><p><strong>Mid :</strong> 右端延伸至 <strong>Mr</strong> 处的回文子串的<strong>中心位置</strong>；<br>即 <strong>Mid + p[Mid] = Mr</strong>；</p>
+</li>
+</ul>
+<p>假设变量的相对位置如图：</p>
+<p>(1) <strong>if (i &lt; Mr)</strong><br>即以 Mid 为中心的回文串为黑色的那段覆盖了红色的两段，</p>
+<p>根据回文串的性质，有 <strong>以 j 为中心</strong> 的回文串 和 <strong>以 i 为中心</strong> 的回文串相等，即图中红色两段相等；</p>
+<p>既然这样，就不用以 $i$ 为中心向两边延伸了，直接 <code>p[i] = p[j]</code> ，加速查找；<br><img src="http://wx1.sinaimg.cn/large/0072GPWsgy1g19kq33qdfj30ro09974b.jpg" alt="这里写图片描述"></p>
+<p>(2) <strong>else</strong><br>即 $i$ 在 Mr 右边，这种情况，只能老老实实向两边延伸了；<br><img src="https://wx2.sinaimg.cn/large/0072GPWsly1g1exooxoixj30qs05b3yc.jpg" alt="image"></p>
+<h4 id="参考代码："><a href="#参考代码：" class="headerlink" title="参考代码："></a>参考代码：</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**********************************************</span></span><br><span class="line"><span class="comment"> *Author*        :XzzF</span></span><br><span class="line"><span class="comment"> *Created Time*  : 2018/4/12 16:42:30</span></span><br><span class="line"><span class="comment"> *Ended  Time*  : 2018/4/12 16:57:48</span></span><br><span class="line"><span class="comment">*********************************************/</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstdio&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstring&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cmath&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstdlib&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">long</span> <span class="keyword">long</span> LL;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> inf = <span class="number">1</span> &lt;&lt; <span class="number">30</span>;</span><br><span class="line"><span class="keyword">const</span> LL INF = <span class="number">1L</span>L &lt;&lt; <span class="number">60</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> MaxN = <span class="number">110005</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> s[MaxN + <span class="number">5</span>];</span><br><span class="line"><span class="keyword">char</span> New_s[<span class="number">2</span> * MaxN + <span class="number">5</span>];  <span class="comment">//填充字符之后的串</span></span><br><span class="line"><span class="keyword">int</span> p[<span class="number">2</span> * MaxN + <span class="number">5</span>];  <span class="comment">//p[i]表示以i为中心的最长回文串半径</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Get_New</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> len = <span class="built_in">strlen</span>(s);</span><br><span class="line">	New_s[<span class="number">0</span>] = <span class="string">'@'</span>; New_s[<span class="number">1</span>] = <span class="string">'#'</span>;</span><br><span class="line">	<span class="keyword">int</span> L = <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; len; i++) &#123;</span><br><span class="line">		New_s[++L] = s[i];</span><br><span class="line">		New_s[++L] = <span class="string">'#'</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	New_s[L + <span class="number">1</span>] = <span class="string">'\0'</span>;   <span class="comment">//不要忘了</span></span><br><span class="line">	<span class="keyword">return</span> L;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Manacher</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> len = Get_New();</span><br><span class="line">	<span class="keyword">int</span> Max_len = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">int</span> Mr = <span class="number">0</span>;       <span class="comment">//遍历过的所有回文串中,所能到达的最右端的位置</span></span><br><span class="line">	<span class="keyword">int</span> Mid = <span class="number">0</span>;       <span class="comment">//能到达最右端位置的回文串的中心位置</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= len; i++) &#123;</span><br><span class="line">		<span class="keyword">if</span>(i &lt; Mr) </span><br><span class="line">			p[i] = min(p[<span class="number">2</span> * Mid - i], Mr - i);</span><br><span class="line">		<span class="keyword">else</span> p[i] = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">		<span class="comment">//不需边界判断,因为左有'@',右有'\0'</span></span><br><span class="line">		<span class="keyword">while</span>(New_s[i - p[i]] == New_s[i + p[i]])</span><br><span class="line">			p[i]++;</span><br><span class="line"></span><br><span class="line">		<span class="comment">//更新Mr</span></span><br><span class="line">		<span class="keyword">if</span>(Mr &lt; i + p[i]) &#123;</span><br><span class="line">			Mid = i;</span><br><span class="line">			Mr = i + p[i];</span><br><span class="line">		&#125;</span><br><span class="line">		Max_len = max(Max_len, p[i] - <span class="number">1</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> Max_len;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">while</span>(<span class="built_in">scanf</span>(<span class="string">"%s"</span>, s) != EOF)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"%d\n"</span>, Manacher());</span><br><span class="line">	&#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="算法复杂度分析："><a href="#算法复杂度分析：" class="headerlink" title="算法复杂度分析："></a>算法复杂度分析：</h3><p>算法复杂度主要来自于那两个循环，外层 <code>for()</code> 循环就不说了，少不了的；主要看里面的 <code>while()</code> 循环进去多少次？ <code>i &gt; Mr</code> 必定会进入 <code>while()</code> 循环，就不看了；</p>
+<h4 id="i-lt-Mr-时的各种情况分析："><a href="#i-lt-Mr-时的各种情况分析：" class="headerlink" title="i &lt;= Mr 时的各种情况分析："></a><code>i &lt;= Mr</code> 时的各种情况分析：</h4><p>当 <code>i &lt;= Mr</code> 时，主要会遇到以下几种情况：</p>
+<p>前提条件：那段黑色的表示以 <code>Mid</code> 为中心的回文串；</p>
+<p>下文中 “回文串x” 表示 <strong>以x为中心</strong> 的回文串；</p>
+<h5 id="回文串-j-全部在-回文串-Mid-内部："><a href="#回文串-j-全部在-回文串-Mid-内部：" class="headerlink" title="回文串 j 全部在 回文串 Mid 内部："></a>回文串 j 全部在 回文串 Mid 内部：</h5><p>对于这种情况，在<code>while()</code> 之前会有 <code>p[i] = p[j]</code> ；如果会进入 <code>while()</code> 循环，那么 回文串 i 的半径一定会有增量，假设增量为图中绿色那段；</p>
+<p>由回文串的性质可得，a = b = c = d ；那么，目前的 $p[j]$ 就等于 紫线+绿线，与原始 $p[j]$ 的定义矛盾！</p>
+<p>所以，这种情况不会进入 <code>while()</code> 循环；</p>
+<p><img src="http://wx2.sinaimg.cn/large/0072GPWsgy1g19kq49bp7j30s706vgli.jpg" alt="这里写图片描述"></p>
+<h5 id="回文串-j-部分在-回文串-Mid-之外："><a href="#回文串-j-部分在-回文串-Mid-之外：" class="headerlink" title="回文串 j 部分在 回文串 Mid 之外："></a>回文串 j 部分在 回文串 Mid 之外：</h5><p>对于这种情况，在 <code>while()</code> 之前就会有 <code>p[i] = Mr - i</code>；如果会进入 <code>while()</code> 循环，回文串 i 的半径同样会有增量，同样设为图中绿色那段；</p>
+<p>同理可得，a = b = c = d ；那么 $p[Mid]$ 就等于 黑线+绿线，同样与原始的 $p[Mid]$ 定义矛盾！</p>
+<p>所以，这种情况也不会进入 <code>while()</code> 循环；</p>
+<p><img src="http://wx4.sinaimg.cn/large/0072GPWsgy1g19kq4wwb4j30od08mdfs.jpg" alt="这里写图片描述"></p>
+<h5 id="回文串-j-的左端正好和-回文串-Mid-的左端重合："><a href="#回文串-j-的左端正好和-回文串-Mid-的左端重合：" class="headerlink" title="回文串 j 的左端正好和 回文串 Mid 的左端重合："></a>回文串 j 的左端正好和 回文串 Mid 的左端重合：</h5><p>对于这种情况，<code>p[i] = Mr - i</code> 之后，依旧有可能增加，所以会进入 <code>while()</code> 循环；</p>
+<p><img src="http://wx4.sinaimg.cn/large/0072GPWsgy1g19kq5jljfj30lb061q2s.jpg" alt="这里写图片描述"></p>
+<h4 id="一本正经的假分析："><a href="#一本正经的假分析：" class="headerlink" title="一本正经的假分析："></a>一本正经的假分析：</h4><p>首先明确，<code>Mr</code> 是<strong>递增</strong>的！且当 <code>Mr</code> 等于右边界时，就不会再进入 <code>while()</code> 循环了！</p>
+<p>在算法过程中，只要进入 <code>while()</code> 循环，一定会使得 <code>Mr</code> 增加！而且， <code>while()</code> 循环进行多少次 <code>Mr</code> 就会增加多少；</p>
+<p>也就是说，在最坏的情况下，<code>Mr</code> 最多增加 $len$ 次，也就等价于内层 <code>while()</code> 循环最多执行 $len$ 次；加上外层循环的 $len$ 次，最坏为 $2 * len$ 次；</p>
+<p>其中，$len$ 为填充后的串的长度，即 $len = 2n$，$T_{worst} = O(4n)$ ， 所以，算法复杂度为 $O(n)$ 。</p>
+<h4 id="实践出真知："><a href="#实践出真知：" class="headerlink" title="实践出真知："></a>实践出真知：</h4><p>定义一个变量 <code>cnt</code> ；在外层 <code>for()</code> 循环下面 和 内层 <code>while()</code> 下面各写上一句 <code>cnt++;</code> 最后输出看看 <code>cnt</code> 的值：</p>
+<table>
+<thead>
+<tr>
+<th>s</th>
+<th>cnt</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>aaaaaaaaa</td>
+<td>36</td>
+</tr>
+<tr>
+<td>ababababa</td>
+<td>35</td>
+</tr>
+<tr>
+<td>abcdefghi</td>
+<td>28</td>
+</tr>
+<tr>
+<td>abbacabab</td>
+<td>34</td>
+</tr>
+</tbody></table>
+<p>还是不错的吧！</p>
+
+      
+    </div>
+    
+    
+    
+	
+	
+	  <div>
+		
+<div style="text-align:center;color: #ccc;font-size:14px;">
+	------ The happy ending<i class="fa fa-hourglass-end"></i>Thank you for reading ------</div>
+
+      </div>
+	
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="\images\wechat.png" alt="XzzF 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="\images\Alipay.jpg" alt="XzzF 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+	
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" rel="tag"><i class="fa fa-tag"></i> 字符串</a>
+          
+            <a href="/tags/Manacher/" rel="tag"><i class="fa fa-tag"></i> Manacher</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/26/KMP/" rel="next" title="KMP">
+                <i class="fa fa-chevron-left"></i> KMP
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/03/2018%E5%9B%9B%E5%B7%9D%E7%9C%81%E8%B5%9B-%E8%A5%BF%E7%A7%91%E5%A4%A7%E6%B8%B8%E8%AE%B0/" rel="prev" title="2018四川省赛-西科大游记">
+                2018四川省赛-西科大游记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/zero.jpg"
+                alt="XzzF" />
+            
+              <p class="site-author-name" itemprop="name">XzzF</p>
+              <p class="site-description motion-element" itemprop="description">N*Practice + M*Comprehend = Better</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/XzzF" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Friends' links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://zzzzone.top/" title="ZZZZone" target="_blank">ZZZZone</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://dwenhu.top/" title="DWH" target="_blank">DWH</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://tanruidd.top/" title="TRDD" target="_blank">TRDD</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://yjh143.top/" title="YJH143" target="_blank">YJH143</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#用途："><span class="nav-number">1.</span> <span class="nav-text">用途：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法详情："><span class="nav-number">2.</span> <span class="nav-text">算法详情：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#预处理："><span class="nav-number">2.1.</span> <span class="nav-text">预处理：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#p-的定义："><span class="nav-number">2.2.</span> <span class="nav-text">p[] 的定义：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#求解p"><span class="nav-number">2.3.</span> <span class="nav-text">求解p[]</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#参考代码："><span class="nav-number">2.4.</span> <span class="nav-text">参考代码：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法复杂度分析："><span class="nav-number">3.</span> <span class="nav-text">算法复杂度分析：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#i-lt-Mr-时的各种情况分析："><span class="nav-number">3.1.</span> <span class="nav-text">i &lt;= Mr 时的各种情况分析：</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#回文串-j-全部在-回文串-Mid-内部："><span class="nav-number">3.1.1.</span> <span class="nav-text">回文串 j 全部在 回文串 Mid 内部：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#回文串-j-部分在-回文串-Mid-之外："><span class="nav-number">3.1.2.</span> <span class="nav-text">回文串 j 部分在 回文串 Mid 之外：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#回文串-j-的左端正好和-回文串-Mid-的左端重合："><span class="nav-number">3.1.3.</span> <span class="nav-text">回文串 j 的左端正好和 回文串 Mid 的左端重合：</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#一本正经的假分析："><span class="nav-number">3.2.</span> <span class="nav-text">一本正经的假分析：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#实践出真知："><span class="nav-number">3.3.</span> <span class="nav-text">实践出真知：</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">XzzF</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">8.8k</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">全站共字数:8.8k</span>
+</div>
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three-waves.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('2');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'manual') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

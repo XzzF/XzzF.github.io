@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" media="all" href="/lib/Han/dist/han.min.css?v=3.3">
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Zoro_32px.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Zoro_16px.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="字符串," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="最近学习了一下 KMP 算法，写一下总结，免得忘了。 KMP算法：暴力匹配的浪费：  假设正在进行下图这样的匹配 :    暴力匹配一旦匹配失败，模式串就会回退到开头进行匹配；  我们可以看到，失配字符 ‘C’ 的前两个字符 (AB) 和开头 (AB) 是一样的，如果挪到开头去匹配，很明显会进行一些不必要的匹配；  显然，将箭头所指字符与失配处进行匹配才是 比较 优的。   KMP 算法就是基于这">
+<meta name="keywords" content="字符串">
+<meta property="og:type" content="article">
+<meta property="og:title" content="KMP">
+<meta property="og:url" content="https:&#x2F;&#x2F;xzzf.github.io&#x2F;2018&#x2F;04&#x2F;26&#x2F;KMP&#x2F;index.html">
+<meta property="og:site_name" content="XzzF的博客">
+<meta property="og:description" content="最近学习了一下 KMP 算法，写一下总结，免得忘了。 KMP算法：暴力匹配的浪费：  假设正在进行下图这样的匹配 :    暴力匹配一旦匹配失败，模式串就会回退到开头进行匹配；  我们可以看到，失配字符 ‘C’ 的前两个字符 (AB) 和开头 (AB) 是一样的，如果挪到开头去匹配，很明显会进行一些不必要的匹配；  显然，将箭头所指字符与失配处进行匹配才是 比较 优的。   KMP 算法就是基于这">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http:&#x2F;&#x2F;wx1.sinaimg.cn&#x2F;large&#x2F;0072GPWsgy1g19kpoys12j30b0037jr8.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;wx3.sinaimg.cn&#x2F;large&#x2F;0072GPWsgy1g19kpp6uf1j30dr02uweb.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;wx2.sinaimg.cn&#x2F;large&#x2F;0072GPWsgy1g19kppccjdj30p804aq2s.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;wx1.sinaimg.cn&#x2F;large&#x2F;0072GPWsgy1g19kpphgd6j30pu05bjra.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;wx3.sinaimg.cn&#x2F;large&#x2F;0072GPWsgy1g19kppmkucj30qt088glj.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;wx4.sinaimg.cn&#x2F;large&#x2F;0072GPWsgy1g19kpqkrw7j30qz07hdfs.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;wx4.sinaimg.cn&#x2F;large&#x2F;0072GPWsgy1g19kpqub5qj30qi06jmx2.jpg">
+<meta property="og:updated_time" content="2019-03-25T04:19:48.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;wx1.sinaimg.cn&#x2F;large&#x2F;0072GPWsgy1g19kpoys12j30b0037jr8.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xzzf.github.io/2018/04/26/KMP/"/>
+
+
+
+
+
+  <title>KMP | XzzF的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">XzzF的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">I will better than 'me'!</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" target="_blank" rel="noopener" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://xzzf.github.io/2018/04/26/KMP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="XzzF">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/zero.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="XzzF的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">KMP</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-26T22:54:46+08:00">
+                2018-04-26
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2019-03-25T12:19:48+08:00">
+                2019-03-25
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ACM/" itemprop="url" rel="index">
+                    <span itemprop="name">ACM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2.3k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  10
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近学习了一下 KMP 算法，写一下总结，免得忘了。</p>
+<h3 id="KMP算法："><a href="#KMP算法：" class="headerlink" title="KMP算法："></a>KMP算法：</h3><h4 id="暴力匹配的浪费："><a href="#暴力匹配的浪费：" class="headerlink" title="暴力匹配的浪费："></a>暴力匹配的浪费：</h4><p>  假设正在进行下图这样的匹配 :</p>
+<p><img src="http://wx1.sinaimg.cn/large/0072GPWsgy1g19kpoys12j30b0037jr8.jpg" alt="这里写图片描述"></p>
+<p>  暴力匹配一旦匹配失败，模式串就会回退到开头进行匹配；<br>  我们可以看到，失配字符 <strong>‘C’</strong> 的前两个字符 <strong>(AB)</strong> 和开头 <strong>(AB)</strong> 是一样的，如果挪到开头去匹配，很明显会进行一些不必要的匹配；<br>  显然，将箭头所指字符与失配处进行匹配才是 <strong>比较</strong> 优的。<br><img src="http://wx3.sinaimg.cn/large/0072GPWsgy1g19kpp6uf1j30dr02uweb.jpg" alt="这里写图片描述"></p>
+<p>  KMP 算法就是基于这个思想的。只要知道有<strong>前缀与后缀匹配</strong> 的 <strong>最大</strong>长度，那某个位置失配之后，就能迅速的像上面那样跳到一个 <strong>比较</strong> 优的位置进行匹配。<br>  为什么是 “比较优” ？后面再说。</p>
+<h4 id="什么叫-“前缀和后缀匹配”"><a href="#什么叫-“前缀和后缀匹配”" class="headerlink" title="什么叫 “前缀和后缀匹配” ?"></a>什么叫 “前缀和后缀匹配” ?</h4><p>  对于一个位置 $i$ ，如果 $str[0, k - 1] = str[i - k, i - 1] $，那么就说 $i$ 位置前缀匹配后缀的最大长度为 $k$ ；我们用 $Next$ 数组存起来，即 $Next[i] = k$ ；<br>  那么，对 $Next[]$ 下个定义：</p>
+<p>  $\bullet ; Next[i] : \quad str[0, i - 1]$ 中前缀匹配后缀的最大长度。</p>
+<p>  如果我们计算出了模式串 $P$ 的每个 $Next[i]$ ，那么在 $pos$ 位置处失配时，立马就可以跳到 $Next[pos]$ 处进行匹配；<br>  所以，$Next$ 数组还可以这样理解：</p>
+<p>  $\bullet ; Next[i] : \quad$ 当 $i$ 位置失配时应该跳往的匹配位置。</p>
+<p>  比如上面的模式串 $P$ :</p>
+<table>
+<thead>
+<tr>
+<th>i</th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>P</td>
+<td>A</td>
+<td>B</td>
+<td>D</td>
+<td>C</td>
+<td>A</td>
+<td>B</td>
+<td>C</td>
+<td>‘\0’</td>
+</tr>
+<tr>
+<td>Next</td>
+<td>-1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>0</td>
+</tr>
+</tbody></table>
+<p>$\quad i = 0$，对于模式串的首字符，我们统一为 $Next[0] = -1$；<br>$\quad i = 1$，前面的字符串为 $A$，其最长相同真前后缀长度为 $0$，即 $Next[1] = 0$；<br>$\quad i = 2$，前面的字符串为 $AB$，其最长相同真前后缀长度为 $0$，即 $Next[2] = 0$；<br>$\quad i = 3$，前面的字符串为 $ABD$，其最长相同真前后缀长度为 $0$，即 $Next[3] = 0$；<br>$\quad i = 4$，前面的字符串为 $ABDC$，其最长相同真前后缀长度为 $0$，即 $Next[4] = 0$；<br>$\quad i = 5$，前面的字符串为 $\color{red}{A}BDC\color{red}{A}$，其最长相同真前后缀为 $A$，即 $Next[5] = 1$；<br>$\quad i = 6$，前面的字符串为 $\color{red}{AB}DC\color{red}{AB}$，其最长相同真前后缀为 $AB$，即 $Next[6] = 2$；<br>$\quad i = 7$，前面的字符串为 $ABDCABC$，其最长相同真前后缀长度为 $0$，即 $Next[7] = 0$。</p>
+<p>  还是开始那个例子，当 $i = 6$ 时，失配，立马就可以跳到 $i = 2$ 的位置进行匹配； faster了有没有？</p>
+<h4 id="如何求Next数组"><a href="#如何求Next数组" class="headerlink" title="如何求Next数组?"></a>如何求Next数组?</h4><p>  假设我们现在正在计算 $Next[i]$ ，即之前的 $Next[0, \ldots , i-1]$ 已经得到了；<br>  先上代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Get_Next</span><span class="params">(<span class="built_in">string</span> P)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">memset</span>(Next, <span class="number">0</span>, <span class="keyword">sizeof</span>(Next));</span><br><span class="line">	<span class="keyword">int</span> P_len = P.length();</span><br><span class="line">	<span class="keyword">int</span> i = <span class="number">0</span>;   <span class="comment">//当前枚举的位置</span></span><br><span class="line">	<span class="keyword">int</span> p = <span class="number">-1</span>;   <span class="comment">//上一次前后缀匹配的最大长度+1,说白了就是Next[i-1]的后一位</span></span><br><span class="line">	Next[<span class="number">0</span>] = <span class="number">-1</span>;</span><br><span class="line">	<span class="keyword">while</span>(i &lt; P_len) &#123;</span><br><span class="line">		<span class="keyword">if</span>(p == <span class="number">-1</span> || P[i] == P[p]) &#123;</span><br><span class="line">			i++;</span><br><span class="line">			p++;</span><br><span class="line">			Next[i] = p;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> p = Next[p];</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>  代码中最重要的就是那个 <strong>if…else…</strong> 语句；<br>  一脸懵逼？？？不怕，上图：<br><img src="http://wx2.sinaimg.cn/large/0072GPWsgy1g19kppccjdj30p804aq2s.jpg" alt="这里写图片描述"></p>
+<p>  假设 $i$ 和 $p$ 的位置如上图，上一次前后缀匹配的最大长度为 $p-1$，即绿色的两个椭圆是相等的；<br>  (1)  <strong>if (P[i] == P[p]) ** ，则往后走就是了；<br>$\qquad$ p == -1 又是为什么呢？一是 p 初始化为-1，总得往后走吧！二是当前后缀匹配长度为 0 时，p会为-1，这时候也得往后走；<br>  (2) **else</strong><br><img src="http://wx1.sinaimg.cn/large/0072GPWsgy1g19kpphgd6j30pu05bjra.jpg" alt="这里写图片描述"></p>
+<p>  由 $Next[p]$ 的定义可知，前两个绿色的椭圆是相等的；于是可知第 $1$ 个和第 $4$ 个椭圆是相等的；<br>  因此，令 $p=Next[p]$ 来加速匹配；</p>
+<h4 id="完整代码："><a href="#完整代码：" class="headerlink" title="完整代码："></a>完整代码：</h4><p>  这其实是一道题：<a href="http://acm.hdu.edu.cn/showproblem.php?pid=2087" target="_blank" rel="noopener">HDU-2087</a></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**********************************************</span></span><br><span class="line"><span class="comment"> *Author*        :XzzF</span></span><br><span class="line"><span class="comment"> *Created Time*  : 2018/4/26 7:07:32</span></span><br><span class="line"><span class="comment"> *Ended  Time*  : 2018/4/26 12:56:37</span></span><br><span class="line"><span class="comment">*********************************************/</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstdio&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstring&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cmath&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstdlib&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">long</span> <span class="keyword">long</span> LL;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> inf = <span class="number">1</span> &lt;&lt; <span class="number">30</span>;</span><br><span class="line"><span class="keyword">const</span> LL INF = <span class="number">1L</span>L &lt;&lt; <span class="number">60</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> MaxN = <span class="number">10005</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">string</span> S, P;</span><br><span class="line"><span class="keyword">int</span> Next[MaxN + <span class="number">5</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Get_Next</span><span class="params">(<span class="built_in">string</span> P)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">memset</span>(Next, <span class="number">0</span>, <span class="keyword">sizeof</span>(Next));</span><br><span class="line">	<span class="keyword">int</span> P_len = P.length();</span><br><span class="line">	<span class="keyword">int</span> i = <span class="number">0</span>;     <span class="comment">//当前枚举的位置</span></span><br><span class="line">	<span class="keyword">int</span> p = <span class="number">-1</span>;  <span class="comment">//上一次前后缀匹配的最大长度+1,说白了就是Next[i-1]的后一位</span></span><br><span class="line">	Next[<span class="number">0</span>] = <span class="number">-1</span>;</span><br><span class="line">	<span class="keyword">while</span>(i &lt; P_len) &#123;</span><br><span class="line">		<span class="keyword">if</span>(p == <span class="number">-1</span> || P[i] == P[p]) &#123;</span><br><span class="line">			i++;</span><br><span class="line">			p++;</span><br><span class="line">			Next[i] = p;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> p = Next[p];</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">KMP</span><span class="params">(<span class="built_in">string</span> S, <span class="built_in">string</span> P)</span> </span>&#123;</span><br><span class="line">	Get_Next(P);</span><br><span class="line">	<span class="keyword">int</span> i = <span class="number">0</span>;      <span class="comment">//index of S</span></span><br><span class="line">	<span class="keyword">int</span> j = <span class="number">0</span>;      <span class="comment">//index of P</span></span><br><span class="line">	<span class="keyword">int</span> cnt = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">while</span>(i &lt; S.length() ) &#123;</span><br><span class="line">		<span class="keyword">if</span>(j == <span class="number">-1</span> || S[i] == P[j]) &#123;</span><br><span class="line">			i++;</span><br><span class="line">			j++;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> j = Next[j];</span><br><span class="line">		<span class="keyword">if</span>(j == P.length()) &#123;</span><br><span class="line">			j = <span class="number">0</span>;    <span class="comment">//不相交匹配则为0,相交匹配则为Next[j]</span></span><br><span class="line">			cnt++;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> cnt;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">while</span>(<span class="built_in">cin</span> &gt;&gt; S &gt;&gt; P) &#123;</span><br><span class="line">		<span class="keyword">if</span>(S[<span class="number">0</span>] == <span class="string">'#'</span>) <span class="keyword">break</span>;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"%d\n"</span>, KMP(S, P));</span><br><span class="line">	&#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="KMP优化"><a href="#KMP优化" class="headerlink" title="KMP优化:"></a>KMP优化:</h3><p>  上面还有一个问题没有解决，为什么说 “比较优” ?</p>
+<h4 id="问题所在："><a href="#问题所在：" class="headerlink" title="问题所在："></a>问题所在：</h4><p>  其实一开始那个表格就能看到问题了，但还是看个”严重”点的吧！</p>
+<table>
+<thead>
+<tr>
+<th>i</th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+<th>9</th>
+<th>10</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>P</td>
+<td>A</td>
+<td>B</td>
+<td>A</td>
+<td>C</td>
+<td>D</td>
+<td>A</td>
+<td>B</td>
+<td>A</td>
+<td>C</td>
+<td>E</td>
+<td>‘\0’</td>
+</tr>
+<tr>
+<td>Next</td>
+<td>-1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>0</td>
+</tr>
+</tbody></table>
+<p>  假设 $i=8$ 时失配，按照之前的KMP算法，就会把 $p=3$ 处的字符拿过来匹配；然而，这两个字符是相同的，就增加了一些不必要的匹配；<br>  稍微修改一下代码就能解决这个问题：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Get_Nextval</span><span class="params">(<span class="built_in">string</span> P)</span> </span>&#123;   <span class="comment">//KMP优化</span></span><br><span class="line">    <span class="keyword">int</span> P_len = P.size();</span><br><span class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;   <span class="comment">// P 的下标</span></span><br><span class="line">    <span class="keyword">int</span> p = <span class="number">-1</span>;  </span><br><span class="line">    Nextval[<span class="number">0</span>] = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (i &lt; P_len)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (p == <span class="number">-1</span> || P[i] == P[p])</span><br><span class="line">        &#123;</span><br><span class="line">            i++;</span><br><span class="line">            p++;</span><br><span class="line">          </span><br><span class="line">            <span class="keyword">if</span> (P[i] != P[p])</span><br><span class="line">                Nextval[i] = p;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                Nextval[i] = Nextval[p];  <span class="comment">//既然相同就继续往前找</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            p = Nextval[p];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>i</th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+<th>9</th>
+<th>10</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>P</td>
+<td>A</td>
+<td>B</td>
+<td>A</td>
+<td>C</td>
+<td>D</td>
+<td>A</td>
+<td>B</td>
+<td>A</td>
+<td>C</td>
+<td>E</td>
+<td>‘\0’</td>
+</tr>
+<tr>
+<td>Next</td>
+<td>-1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Nextval</td>
+<td>-1</td>
+<td>0</td>
+<td>-1</td>
+<td>1</td>
+<td>0</td>
+<td>-1</td>
+<td>0</td>
+<td>-1</td>
+<td>1</td>
+<td>4</td>
+<td>0</td>
+</tr>
+</tbody></table>
+<p>  优化之后，当 $i=8$ 失配时，就能直接跳到 $p=1$ 处匹配，faster 了有没有？匹配方式还是没变的；</p>
+<p>  严格来讲，未优化的 KMP 算法叫 MP算法；但一般情况下，未优化的 KMP 算法已经够用了；</p>
+<p>  <strong>KMP算法(未优化)：</strong> $Next[]$ 表示前后缀匹配的最大长度，还有一些骚操作，后面再说；<br>  <strong>KMP算法(优化)：</strong> $Nextval[]$ 表示最优长度，但<strong>不一定是最长</strong>；快是快了，功能少了；</p>
+<p>  <strong>复杂度</strong>：$O(n+m)$  <del>并不会证明</del></p>
+<h3 id="More-about-KMP"><a href="#More-about-KMP" class="headerlink" title="More about KMP :"></a>More about KMP :</h3><h4 id="KMP求最小循环节："><a href="#KMP求最小循环节：" class="headerlink" title="KMP求最小循环节："></a>KMP求最小循环节：</h4><p>现在假设 $i$ 位置之前的字符串是循环的(比如 $str[0, i-1] = aabaab$)  ，我们想求它的最小循环节；</p>
+<p>根据 $Next[]$ 的定义，如果 $i$ 位置 相匹配的前后缀<strong>没有相互覆盖</strong>，显然这个前缀一定不会是循环的，所以我们主要考虑前后缀相互覆盖的情况；</p>
+<p><img src="http://wx3.sinaimg.cn/large/0072GPWsgy1g19kppmkucj30qt088glj.jpg" alt="这里写图片描述"></p>
+<p>  如图所示，$Next[i]$ 为红色那段，然后将后面剩下的那段黑色的定义为 $loop$ ，即 $loop = i - Next[i]$；</p>
+<p>  由于串是在自匹配，所以 $loop$ 是等于后面的两段的；</p>
+<p>  由 $Next[]$ 定义可知，前两段绿线隔出来的串是相等的，后两段绿线隔出来的串也是相等的；</p>
+<p>  那我们把前后两段都砍了；</p>
+<p><img src="http://wx4.sinaimg.cn/large/0072GPWsgy1g19kpqkrw7j30qz07hdfs.jpg" alt="这里写图片描述"></p>
+<p>  这和上面的是一样的嘛！继续砍。。。</p>
+<p><img src="http://wx4.sinaimg.cn/large/0072GPWsgy1g19kpqub5qj30qi06jmx2.jpg" alt="这里写图片描述"></p>
+<p>  砍到最后，剩下的 $4$ 个串都是相等的；自然就可以推出上一次砍掉的 $4$ 个串也是相等的；</p>
+<p>  有点类似于递归回溯的思想；</p>
+<p>  那么，就说明 $loop$ 就是 $i$ 以前的前缀的 <strong>循环节</strong>；</p>
+<p>  再来说为什么是最小的？很简单，</p>
+<p>  $Next[]$ 的定义是什么？前后缀匹配的 <strong>最大</strong> 长度！显然，剩下的 $loop$ 就是最小的啦！</p>
+<p>  既然我们能将每个位置以前的最小循环节求出，那整个串的最小循环节自然就不是问题了；</p>
+<p>  有一道题可以做一下：<a href="http://acm.hdu.edu.cn/showproblem.php?pid=1358" target="_blank" rel="noopener">HDU-1358</a></p>
+<p>  题意就是让从小到大输出哪些位置之前的串是循环的，以及循环次数；</p>
+<p>  参考代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/********************************************</span></span><br><span class="line"><span class="comment"> *Author*        :XzzF</span></span><br><span class="line"><span class="comment"> *Created Time*  : 2018年04月25日 星期三 21时06分25秒</span></span><br><span class="line"><span class="comment"> * Ended  Time*  : 2018年04月25日 星期三 21时31分56秒</span></span><br><span class="line"><span class="comment">*********************************************/</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstdio&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cmath&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstdlib&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstring&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">long</span> <span class="keyword">long</span> LL;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> inf = <span class="number">1</span> &lt;&lt; <span class="number">30</span>;</span><br><span class="line"><span class="keyword">const</span> LL INF = <span class="number">1L</span>L &lt;&lt; <span class="number">60</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> MaxN = <span class="number">1000000</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n;</span><br><span class="line"><span class="built_in">string</span> S;</span><br><span class="line"><span class="keyword">int</span> Next[MaxN + <span class="number">5</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">GetNext</span><span class="params">(<span class="built_in">string</span> S)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">memset</span>(Next, <span class="number">0</span>, <span class="keyword">sizeof</span>(Next));</span><br><span class="line">	<span class="keyword">int</span> len = S.length();</span><br><span class="line">	<span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">int</span> pos = <span class="number">-1</span>;</span><br><span class="line">	Next[<span class="number">0</span>] = <span class="number">-1</span>;</span><br><span class="line">	<span class="keyword">while</span>(i &lt; len) &#123;</span><br><span class="line">		<span class="keyword">if</span>(pos == <span class="number">-1</span> || S[pos] == S[i]) &#123;</span><br><span class="line">			i++;</span><br><span class="line">			pos++;</span><br><span class="line">			Next[i] = pos;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> pos = Next[pos];</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	ios :: sync_with_stdio(<span class="literal">false</span>);</span><br><span class="line">	<span class="built_in">cin</span>.tie(<span class="number">0</span>); <span class="built_in">cout</span>.tie(<span class="number">0</span>);</span><br><span class="line">	<span class="keyword">int</span> Cas = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">while</span>(<span class="built_in">cin</span> &gt;&gt; n) &#123;</span><br><span class="line">		<span class="keyword">if</span>(n == <span class="number">0</span>) <span class="keyword">break</span>;</span><br><span class="line">		<span class="built_in">cin</span> &gt;&gt; S;</span><br><span class="line">		GetNext(S);</span><br><span class="line">		<span class="built_in">cout</span> &lt;&lt; <span class="string">"Test case #"</span> &lt;&lt; ++Cas &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">			<span class="keyword">int</span> loop = i - Next[i];</span><br><span class="line">			<span class="comment">//i % loop == 0: 得被长度整除才有可能是循环节吧!</span></span><br><span class="line">			<span class="comment">//i != loop: Next[i]==0时也能满足前一个条件,得判掉</span></span><br><span class="line">			<span class="keyword">if</span>(i % loop == <span class="number">0</span> &amp;&amp; i != loop) </span><br><span class="line">				<span class="built_in">cout</span> &lt;&lt; i &lt;&lt; <span class="string">" "</span> &lt;&lt; i / loop &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">			<span class="comment">//i / loop 就是循环次数了</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">cout</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+	
+	
+	  <div>
+		
+<div style="text-align:center;color: #ccc;font-size:14px;">
+	------ The happy ending<i class="fa fa-hourglass-end"></i>Thank you for reading ------</div>
+
+      </div>
+	
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="\images\wechat.png" alt="XzzF 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="\images\Alipay.jpg" alt="XzzF 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+	
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" rel="tag"><i class="fa fa-tag"></i> 字符串</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/02/Manacher/" rel="prev" title="Manacher">
+                Manacher <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/zero.jpg"
+                alt="XzzF" />
+            
+              <p class="site-author-name" itemprop="name">XzzF</p>
+              <p class="site-description motion-element" itemprop="description">N*Practice + M*Comprehend = Better</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/XzzF" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Friends' links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://zzzzone.top/" title="ZZZZone" target="_blank">ZZZZone</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://dwenhu.top/" title="DWH" target="_blank">DWH</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://tanruidd.top/" title="TRDD" target="_blank">TRDD</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://yjh143.top/" title="YJH143" target="_blank">YJH143</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#KMP算法："><span class="nav-number">1.</span> <span class="nav-text">KMP算法：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#暴力匹配的浪费："><span class="nav-number">1.1.</span> <span class="nav-text">暴力匹配的浪费：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#什么叫-“前缀和后缀匹配”"><span class="nav-number">1.2.</span> <span class="nav-text">什么叫 “前缀和后缀匹配” ?</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何求Next数组"><span class="nav-number">1.3.</span> <span class="nav-text">如何求Next数组?</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#完整代码："><span class="nav-number">1.4.</span> <span class="nav-text">完整代码：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#KMP优化"><span class="nav-number">2.</span> <span class="nav-text">KMP优化:</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#问题所在："><span class="nav-number">2.1.</span> <span class="nav-text">问题所在：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#More-about-KMP"><span class="nav-number">3.</span> <span class="nav-text">More about KMP :</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#KMP求最小循环节："><span class="nav-number">3.1.</span> <span class="nav-text">KMP求最小循环节：</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">XzzF</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">8.8k</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">全站共字数:8.8k</span>
+</div>
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three-waves.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('2');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'manual') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>
